@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Sample Bakery logo">
+  <circle cx="60" cy="60" r="56" fill="#D4A92C"/>
+  <circle cx="60" cy="60" r="46" fill="none" stroke="#2A2118" stroke-width="3"/>
+  <path d="M30 70c0-16 13-28 30-28s30 12 30 28z" fill="#2A2118"/>
+  <rect x="28" y="72" width="64" height="8" rx="4" fill="#2A2118"/>
+  <path d="M46 48c0-6 6-10 14-10s14 4 14 10" fill="none" stroke="#2A2118" stroke-width="3" stroke-linecap="round"/>
+</svg>

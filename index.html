@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample Bakery Wholesale Ordering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Karla:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --cream: #FBF7EF; --gold: #D4A92C; --dark: #2A2118; --dark2: #3A3128;
+  --muted: #9A8B6B; --line: #E8DFCC; --white: #FFFFFF; --green: #1F9D55; --red: #C0392B;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: Karla, 'Helvetica Neue', Arial, sans-serif; background: var(--cream); color: var(--dark); min-height: 100vh; }
+
+.demo-banner { background: var(--gold); color: var(--dark); text-align: center; font-size: 13px; padding: 6px 12px; font-weight: 600; }
+
+.topbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 12px; padding: 0 20px; height: 62px; background: var(--dark); color: var(--cream); }
+.brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.brand img { height: 34px; }
+.brand-name { font-family: 'Instrument Serif', Georgia, serif; font-size: 20px; line-height: 1; }
+.brand-sub { font-size: 8px; letter-spacing: .2em; color: #A99B7C; margin-top: 3px; display: block; }
+.search { flex: 1; max-width: 420px; margin-left: auto; }
+.search input { width: 100%; height: 40px; border-radius: 999px; border: 1px solid #4A3F32; background: var(--dark2); color: var(--cream); padding: 0 16px; font: inherit; font-size: 14px; outline: none; }
+.search input::placeholder { color: #A99B7C; }
+.track-link { background: transparent; border: 1px solid #6A5C4A; color: var(--cream); border-radius: 999px; height: 36px; padding: 0 14px; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.track-link:hover { border-color: var(--gold); color: var(--gold); }
+
+.cats { display: flex; gap: 8px; padding: 14px 20px 0; overflow-x: auto; }
+.cat { border: 1px solid var(--line); background: var(--white); color: var(--dark); border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 14px; cursor: pointer; white-space: nowrap; }
+.cat.active { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
+.layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; padding: 16px 20px 110px; max-width: 1200px; margin: 0 auto; }
+h1 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 30px; margin: 6px 0 2px; }
+.note { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+
+.product { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
+.p-name { font-weight: 600; font-size: 15px; }
+.p-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.p-price { font-size: 13px; margin-top: 4px; }
+.stepper { display: flex; align-items: center; gap: 8px; }
+.stepper button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--cream); font-size: 18px; cursor: pointer; color: var(--dark); }
+.stepper button:hover { background: var(--gold); border-color: var(--gold); }
+.stepper .qty { min-width: 24px; text-align: center; font-weight: 700; }
+.empty { text-align: center; color: var(--muted); padding: 40px 0; }
+
+.panel { position: sticky; top: 78px; align-self: start; background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+.panel h2 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 24px; margin: 0; }
+.panel .sub { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.line { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 7px 0; border-bottom: 1px dashed var(--line); }
+.line span:last-child { white-space: nowrap; font-weight: 600; }
+.total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; }
+.total .amt { font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; }
+.hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.btn { width: 100%; height: 46px; border: 0; border-radius: 10px; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+.btn.primary { background: var(--dark); color: var(--cream); }
+.btn.primary:disabled { opacity: .45; cursor: not-allowed; }
+.btn.wa { background: var(--green); color: #fff; }
+.btn.alt { background: var(--white); color: var(--dark); border: 1px solid var(--line); }
+.btn.close { background: transparent; color: var(--muted); }
+
+.mobile-bar { display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: var(--dark); color: var(--cream); padding: 10px 16px; align-items: center; justify-content: space-between; }
+.mobile-bar button { height: 42px; padding: 0 22px; border: 0; border-radius: 10px; background: var(--gold); color: var(--dark); font: inherit; font-weight: 700; cursor: pointer; }
+.mobile-bar button:disabled { opacity: .5; }
+.mobile-bar .amt { font-family: 'Instrument Serif', Georgia, serif; font-size: 22px; }
+
+.modal { position: fixed; inset: 0; z-index: 100; background: rgba(42,33,24,.55); display: none; align-items: center; justify-content: center; padding: 16px; }
+.modal.open { display: flex; }
+.box { background: var(--white); border-radius: 16px; width: 100%; max-width: 460px; max-height: 92vh; overflow-y: auto; padding: 20px; }
+.box h3 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 22px; margin: 14px 0 6px; }
+.policy { background: #FFF6DD; border: 1px solid #F0DDA0; border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+.policy p { margin: 4px 0; }
+.box input { width: 100%; height: 42px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font: inherit; font-size: 14px; margin-bottom: 8px; }
+.field-label { font-size: 12px; color: var(--muted); margin: 2px 0 3px; display: block; }
+.logo-wrap { text-align: center; }
+.logo-wrap img { height: 60px; }
+.error { background: #FDECEA; border: 1px solid #F3B8B1; color: var(--red); border-radius: 10px; padding: 10px 12px; font-size: 13px; margin-top: 10px; display: none; }
+.error.show { display: block; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+.done { text-align: center; }
+.done .tick { width: 56px; height: 56px; border-radius: 50%; background: var(--green); color: #fff; font-size: 30px; line-height: 56px; margin: 6px auto 8px; }
+.refbox { background: var(--cream); border: 1px dashed var(--gold); border-radius: 12px; padding: 12px; margin: 12px 0; }
+.refbox .label { font-size: 12px; color: var(--muted); }
+.refbox .ref { font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; letter-spacing: .04em; user-select: all; }
+.badge { display: inline-block; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 700; background: #FFF1C9; color: #7A5B00; }
+.badge.ok { background: #DDF3E6; color: #14703C; }
+.badge.bad { background: #FDECEA; color: var(--red); }
+.small { font-size: 13px; color: var(--muted); }
+
+.steps { list-style: none; margin: 14px 0 6px; padding: 0; text-align: left; }
+.steps li { position: relative; padding: 0 0 14px 34px; font-size: 14px; color: var(--muted); }
+.steps li::before { content: ""; position: absolute; left: 8px; top: 18px; bottom: -2px; width: 2px; background: var(--line); }
+.steps li:last-child::before { display: none; }
+.steps li .dot { position: absolute; left: 0; top: 0; width: 18px; height: 18px; border-radius: 50%; background: var(--white); border: 2px solid var(--line); }
+.steps li.done-step { color: var(--dark); }
+.steps li.done-step .dot { background: var(--green); border-color: var(--green); }
+.steps li.current { color: var(--dark); font-weight: 700; }
+.steps li.current .dot { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 0 4px #F6E7B5; }
+.result-box { text-align: left; margin-top: 12px; }
+.result-box .row { font-size: 13px; margin: 4px 0; }
+.result-box .row b { font-weight: 700; }
+.linkbtn { background: none; border: 0; padding: 0; margin: 4px 0 8px; color: #8A6A00; font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+.divider { border: 0; border-top: 1px dashed var(--line); margin: 14px 0; }
+.seller-note { background: #EEF6FF; border: 1px solid #C9DFF7; border-radius: 10px; padding: 10px 12px; font-size: 13px; margin-top: 10px; }
+
+.hero { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 26px 28px; background: linear-gradient(115deg, #2A2118 0%, #4A3520 55%, #8A6420 100%); color: var(--cream); }
+.hero h2 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 34px; line-height: 1.1; margin: 0 0 6px; max-width: 460px; }
+.hero p { margin: 0; font-size: 14px; color: #E7D9B8; max-width: 440px; }
+.hero-art { display: flex; gap: 10px; flex-shrink: 0; }
+.hero-art .ph { width: 92px; height: 92px; border-radius: 22px; box-shadow: 0 8px 18px rgba(0,0,0,.28); transform: rotate(-4deg); }
+.hero-art .ph:nth-child(2) { transform: translateY(10px) rotate(3deg); }
+.hero-art .ph:nth-child(3) { transform: rotate(-2deg); }
+.ph { width: 64px; height: 64px; border-radius: 14px; flex-shrink: 0; overflow: hidden; display: block; object-fit: cover; }
+.ph svg { width: 100%; height: 100%; display: block; }
+.product { grid-template-columns: 64px 1fr auto !important; }
+.styles { display: inline-flex; gap: 4px; margin-left: 12px; vertical-align: middle; }
+.styles button { border: 1px solid rgba(42,33,24,.45); background: transparent; color: var(--dark); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.styles button.on { background: #2A2118; color: #FBF7EF; border-color: #2A2118; }
+.stepper .qty { width: 46px; height: 34px; border: 1px solid var(--line); border-radius: 8px; background: var(--white); color: inherit; font: inherit; font-weight: 700; text-align: center; padding: 0; }
+.stepper .quick { display: none; width: auto; border-radius: 8px; padding: 0 9px; font-size: 13px; font-weight: 700; }
+.repeat { display: none; width: 100%; margin: 0 0 12px; padding: 12px 14px; border: 1px dashed var(--gold); background: transparent; color: inherit; border-radius: 12px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-align: left; }
+.repeat.show { display: block; }
+
+/* ---- Style: Fast order (compact list, type quantities, quick +5 / +10) ---- */
+.style-fast .hero { display: none; }
+.style-fast .layout { max-width: 1320px; padding-top: 10px; }
+.style-fast h1 { font-size: 22px; margin: 0; }
+.style-fast .note { margin-bottom: 8px; }
+.style-fast .product { grid-template-columns: 40px 1fr auto !important; gap: 10px; padding: 5px 10px; margin-bottom: 3px; border-radius: 8px; }
+.style-fast .product .ph { width: 40px; height: 40px; border-radius: 8px; }
+.style-fast .p-name { font-size: 14px; }
+.style-fast .p-meta { display: inline; margin-right: 8px; }
+.style-fast .p-price { display: inline; font-weight: 700; margin: 0; }
+.style-fast .stepper { gap: 4px; }
+.style-fast .stepper button { width: 32px; height: 32px; border-radius: 8px; }
+.style-fast .stepper .quick { display: inline-block; width: auto; }
+.style-fast .stepper .qty { width: 54px; height: 32px; }
+.product.has { border-color: var(--gold); }
+@media (max-width: 720px) { .style-fast .stepper .quick { display: none; } .style-fast .p-meta { display: none; } }
+
+.foot { text-align: center; padding: 0 0 90px; }
+.foot .linkbtn { color: var(--muted); font-size: 12px; }
+.soldout { font-size: 13px; font-weight: 700; color: var(--red); }
+.admin-box { max-width: 720px; }
+.arow:not(.ahead) { padding-bottom: 8px; border-bottom: 1px dashed var(--line); }
+.arow { display: grid; grid-template-columns: 1.6fr 1fr .7fr 1fr auto auto; gap: 6px; align-items: center; margin-bottom: 6px; }
+.arow input { margin: 0; height: 38px; font-size: 13px; padding: 0 8px; }
+.arow label { font-size: 12px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.arow input[type=checkbox] { width: 16px; height: 16px; margin: 0; }
+.arow .del { border: 0; background: transparent; color: var(--red); font-size: 20px; cursor: pointer; padding: 0 6px; }
+.ahead { font-size: 11px; color: var(--muted); }
+.ok-msg { background: #DDF3E6; border: 1px solid #A9DDBE; color: #14703C; border-radius: 10px; padding: 10px 12px; font-size: 13px; margin-top: 10px; display: none; }
+.ok-msg.show { display: block; }
+@media (max-width: 720px) { .hero { padding: 18px 16px; } .hero h2 { font-size: 24px; } .hero-art { display: none; } }
+@media (max-width: 720px) { .arow { grid-template-columns: 1fr 1fr; } .arow .name { grid-column: 1 / -1; } .ahead { display: none; } }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .panel { display: none; }
+  .mobile-bar { display: flex; }
+  .search { max-width: none; min-width: 0; }
+  .brand-sub, .brand-name { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="demo-banner">DEMO — sample products and prices only. This is not a real shop.<span class="styles" id="styles" aria-label="Page style"></span></div>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="logo.svg" alt="Sample Bakery logo">
+    <div><span class="brand-name">Sample Bakery</span><span class="brand-sub">WHOLESALE ORDERING</span></div>
+  </div>
+  <div class="search"><input id="search" type="search" placeholder="Search product or code…"></div>
+  <button class="track-link" id="openTrack" type="button">Track order</button>
+</header>
+
+<section class="hero">
+  <div><h2 id="heroTitle"></h2><p id="heroText"></p></div>
+  <div class="hero-art" id="heroArt" aria-hidden="true"></div>
+</section>
+
+<div class="cats" id="cats"></div>
+
+<div class="layout">
+  <main>
+    <h1 id="title">All products</h1>
+    <div class="note">Prices are indicative. The seller confirms your order and the final price after you submit.</div>
+    <button class="repeat" id="repeatBtn" type="button"></button>
+    <div id="list"></div>
+  </main>
+
+  <aside class="panel">
+    <h2>Current order</h2>
+    <div class="sub" id="count">0 items</div>
+    <div id="lines"><div class="empty">Your order is empty.</div></div>
+    <div class="total"><span>Total</span><span class="amt" id="total">RM 0.00</span></div>
+    <div class="hint">Indicative total.</div>
+    <button class="btn primary" id="review" disabled>Review &amp; submit</button>
+  </aside>
+</div>
+
+<div class="foot"><button class="linkbtn" id="openOwner" type="button">Owner login</button></div>
+
+<div class="mobile-bar">
+  <div><div id="mCount" style="font-size:12px;">0 items</div><div class="amt" id="mTotal">RM 0.00</div></div>
+  <button id="mReview" disabled>Review</button>
+</div>
+
+<!-- ORDER POPUP: step 1 = details, step 2 = done -->
+<div class="modal" id="modal">
+  <div class="box">
+    <div id="formView">
+      <div class="logo-wrap"><img src="logo.svg" alt="Sample Bakery logo"></div>
+      <div class="policy">
+        <strong>IMPORTANT</strong>
+        <p>Your order is <b>Pending</b> until the seller confirms it by phone or WhatsApp. Please keep your order number so you can check the status any time.</p>
+      </div>
+      <h3>Customer details</h3>
+      <input id="cName" placeholder="Customer name" autocomplete="name">
+      <input id="cShop" placeholder="Shop / brand name" autocomplete="organization">
+      <input id="cPhone" placeholder="Contact number (the seller will call or WhatsApp you)" inputmode="tel" autocomplete="tel">
+      <input id="cEmail" type="email" placeholder="Email (optional) - we will email your order number" autocomplete="email">
+      <label class="field-label" for="cDate">Delivery date</label>
+      <input id="cDate" type="date">
+      <input class="hp" id="cWebsite" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" placeholder="Leave this empty">
+      <h3>Your order</h3>
+      <div id="summary"></div>
+      <div class="total"><span>Total (indicative)</span><span class="amt" id="sTotal">RM 0.00</span></div>
+      <div class="error" id="formError" role="alert"></div>
+      <button class="btn primary" id="submitBtn">Submit order</button>
+      <button class="btn close" id="closeModal">Close</button>
+    </div>
+
+    <div id="doneView" class="done" style="display:none;">
+      <div class="tick">✓</div>
+      <h3 style="margin-top:0;">Order submitted</h3>
+      <div class="refbox">
+        <div class="label">Your order number</div>
+        <div class="ref" id="doneRef"></div>
+      </div>
+      <span class="badge">Status: Pending</span>
+      <p class="small" id="doneText">The seller will contact you to confirm your order. Keep this number to check your status.</p>
+      <button class="btn primary" id="doneTrack">Track this order</button>
+      <button class="btn wa" id="sendWa">Also send a copy via WhatsApp</button>
+      <button class="btn alt" id="sendMail">Also send a copy via Email</button>
+      <button class="btn close" id="newOrder">Start a new order</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRACK POPUP -->
+<div class="modal" id="trackModal">
+  <div class="box">
+    <h3 style="margin-top:0;">Track your order</h3>
+    <label class="field-label" for="tRef">Order number</label>
+    <input id="tRef" placeholder="e.g. SB-261007-K4P9" autocapitalize="characters" autocomplete="off">
+    <label class="field-label" for="tPhone">Phone number used for the order</label>
+    <input id="tPhone" placeholder="Phone number" inputmode="tel" autocomplete="tel">
+    <div class="error" id="trackError" role="alert"></div>
+    <button class="btn primary" id="trackBtn">Check status</button>
+    <button class="linkbtn" id="forgotLink" type="button">Forgot your order number?</button>
+    <div id="findPanel" style="display:none;">
+      <hr class="divider">
+      <p class="small" style="margin:0 0 8px;">Enter the phone number and delivery date from your order.</p>
+      <input id="fPhone" placeholder="Phone number" inputmode="tel" autocomplete="tel">
+      <label class="field-label" for="fDate">Delivery date</label>
+      <input id="fDate" type="date">
+      <button class="btn alt" id="findBtn">Find my order</button>
+    </div>
+    <div id="trackResult" class="result-box"></div>
+    <button class="btn close" id="closeTrack">Close</button>
+  </div>
+</div>
+
+<!-- OWNER POPUP: log in, then add / edit / hide products -->
+<div class="modal" id="ownerModal">
+  <div class="box admin-box">
+    <div id="ownerLogin">
+      <h3 style="margin-top:0;">Owner login</h3>
+      <p class="small" style="margin:0 0 8px;">Only the shop owner can change products here.</p>
+      <input id="oPass" type="password" placeholder="Owner password" autocomplete="current-password">
+      <div class="error" id="oLoginError" role="alert"></div>
+      <button class="btn primary" id="oLoginBtn">Log in</button>
+      <button class="btn close" id="oCloseLogin">Close</button>
+    </div>
+    <div id="ownerEdit" style="display:none;">
+      <h3 style="margin-top:0;">Your products</h3>
+      <p class="small" style="margin:0 0 10px;">Change anything below, then press <b>Save changes</b>. Tick <b>In stock</b> off to show an item as Sold out.</p>
+      <div class="arow ahead"><span>Product name</span><span>Pack size</span><span>Price</span><span>Category</span><span>Stock</span><span></span></div>
+      <div id="oRows"></div>
+      <button class="btn alt" id="oAdd">+ Add a product</button>
+      <div class="error" id="oError" role="alert"></div>
+      <div class="ok-msg" id="oOk" role="status"></div>
+      <button class="btn primary" id="oSave">Save changes</button>
+      <button class="btn close" id="oLogout">Log out &amp; close</button>
+    </div>
+    <datalist id="catList"></datalist>
+  </div>
+</div>
+
+<script>
+/* ============ EDIT THESE FOR EACH CLIENT ============ */
+const BUSINESS_NAME   = "Sample Bakery";
+const ORDER_PREFIX    = "SB";                   // 2-5 capital letters, start of every order number
+const WHATSAPP_NUMBER = "60100000000";          // placeholder - digits only, with country code
+const ORDER_EMAIL     = "orders@example.com";   // placeholder
+const CURRENCY        = "RM";
+const DEFAULT_STYLE   = "classic";              // "classic" or "fast"
+const SHOW_STYLE_SWITCHER = true;               // true: visitors can try both looks (good for demos). Set false for a real client.
+const HERO_TITLE      = "Fresh from the oven, delivered to your shop.";
+const HERO_TEXT       = "Pick your products, send your order, and follow it step by step until it arrives.";
+const SHEET_URL       = "https://script.google.com/macros/s/AKfycbzeTUlZB0HvX9J_KqE_eYzlmJzGrWOz9ug0F2YMHUjTxl1jJJZcjcVR__uk28kaicE3/exec"; // Google Apps Script web app (see apps-script/Code.gs)
+
+const BUILT_IN_PRODUCTS = [   // used until the owner saves a list from the Owner screen
+  { code: "SB-BRD-001", name: "Sourdough Loaf",          pack: "10 loaves",  price: 62.00, cat: "Bread" },
+  { code: "SB-BRD-002", name: "Wholemeal Sandwich Loaf", pack: "12 loaves",  price: 54.00, cat: "Bread" },
+  { code: "SB-BRD-003", name: "Soft Dinner Roll",        pack: "60 pcs",     price: 36.00, cat: "Bread" },
+  { code: "SB-BRD-004", name: "Garlic Baguette",         pack: "20 pcs",     price: 48.00, cat: "Bread" },
+  { code: "SB-CKE-001", name: "Chocolate Fudge Cake",    pack: "1 cake (8\")", price: 38.00, cat: "Cakes" },
+  { code: "SB-CKE-002", name: "Vanilla Sponge Cake",     pack: "1 cake (8\")", price: 32.00, cat: "Cakes" },
+  { code: "SB-CKE-003", name: "Mini Cupcake Assorted",   pack: "24 pcs",     price: 45.00, cat: "Cakes" },
+  { code: "SB-CKE-004", name: "Cheesecake Slice",        pack: "12 slices",  price: 58.00, cat: "Cakes" },
+  { code: "SB-PST-001", name: "Butter Croissant",        pack: "30 pcs",     price: 66.00, cat: "Pastries" },
+  { code: "SB-PST-002", name: "Chocolate Danish",        pack: "24 pcs",     price: 60.00, cat: "Pastries" },
+  { code: "SB-PST-003", name: "Apple Turnover",          pack: "24 pcs",     price: 55.00, cat: "Pastries" },
+  { code: "SB-PST-004", name: "Cinnamon Roll",           pack: "20 pcs",     price: 52.00, cat: "Pastries" },
+  { code: "SB-CKI-001", name: "Chocolate Chip Cookie",   pack: "40 pcs",     price: 40.00, cat: "Cookies" },
+  { code: "SB-CKI-002", name: "Butter Cookie Tin",       pack: "12 tins",    price: 72.00, cat: "Cookies" },
+  { code: "SB-CKI-003", name: "Oat & Raisin Cookie",     pack: "40 pcs",     price: 38.00, cat: "Cookies" },
+  { code: "SB-CKI-004", name: "Almond Biscotti",         pack: "30 pcs",     price: 44.00, cat: "Cookies" }
+];
+
+let PRODUCTS = BUILT_IN_PRODUCTS.map(p => Object.assign({ available: true }, p));
+
+/* Order steps shown to the customer. The seller picks these in the Status column of the Orders sheet. */
+const STATUS_FLOW = ["Pending", "Confirmed", "Preparing", "Out for delivery", "Delivered"];
+const STATUS_HELP = {
+  "Pending":          "We received your order. The seller will contact you to confirm it.",
+  "Confirmed":        "The seller confirmed your order.",
+  "Preparing":        "Your order is being prepared.",
+  "Out for delivery": "Your order is on its way.",
+  "Delivered":        "Your order was delivered. Thank you!",
+  "Rejected":         "The seller could not accept this order. Please contact them for details."
+};
+
+/* ============ APP ============ */
+const $ = id => document.getElementById(id);
+const money = n => CURRENCY + " " + Number(n).toFixed(2);
+const cart = new Map();           // code -> qty
+let activeCat = "All";
+let currentRef = null;            // order number for the order being submitted
+let lastOrderText = "";           // text copy used for WhatsApp / Email after submitting
+
+/* Picture tiles: drawn icons by category. A product with its own photo address shows that photo instead. */
+const ICONS = {
+  bread:  ['#F3DDB0', '<ellipse cx="32" cy="40" rx="22" ry="12" fill="#C98A45"/><path d="M11 40c0-12 9-19 21-19s21 7 21 19z" fill="#E3AE68"/><path d="M22 29l5 9M32 27l4 10M42 29l3 9" stroke="#B26F2E" stroke-width="3" stroke-linecap="round"/>'],
+  cake:   ['#F8DCE3', '<rect x="13" y="30" width="38" height="21" rx="4" fill="#7A4A30"/><path d="M13 37c6 5 10-3 19 2s13-4 19 1v-10c0-3-2-5-5-5H18c-3 0-5 2-5 5z" fill="#FBEFF3"/><circle cx="32" cy="22" r="5" fill="#D9363E"/><path d="M32 17c0-4 2-6 5-7" stroke="#4C7A34" stroke-width="2.5" fill="none" stroke-linecap="round"/>'],
+  pastry: ['#FBE6C2', '<path d="M7 42c3-17 14-24 25-24s22 7 25 24c-6-4-10-5-14-3-4-4-18-4-22 0-4-2-8-1-14 3z" fill="#E0A04E"/><path d="M23 22l4 15M32 19v18M41 22l-4 15" stroke="#B26F2E" stroke-width="2.8" stroke-linecap="round"/>'],
+  cookie: ['#EBDCC8', '<circle cx="32" cy="32" r="21" fill="#D9A25B"/><circle cx="24" cy="25" r="3.2" fill="#5E3A22"/><circle cx="38" cy="24" r="3" fill="#5E3A22"/><circle cx="41" cy="37" r="3.4" fill="#5E3A22"/><circle cx="26" cy="40" r="3" fill="#5E3A22"/><circle cx="33" cy="32" r="2.4" fill="#5E3A22"/>'],
+  other:  ['#E8E1D3', '<rect x="12" y="26" width="40" height="26" rx="5" fill="#C9955A"/><rect x="12" y="26" width="40" height="8" rx="4" fill="#E3B27A"/><path d="M32 26v26" stroke="#A9733A" stroke-width="3"/><path d="M32 26c-6-10-14-6-8-2m8 2c6-10 14-6 8-2" stroke="#A9733A" stroke-width="2.5" fill="none" stroke-linecap="round"/>']
+};
+function iconKind(cat, name) {
+  const t = (cat + " " + name).toLowerCase();
+  if (/cake|cupcake|cheese/.test(t)) return "cake";
+  if (/pastr|croissant|danish|turnover|roll\b|puff|tart|pie/.test(t) && !/dinner roll/.test(t)) return "pastry";
+  if (/cook|biscu|biscotti|cracker/.test(t)) return "cookie";
+  if (/bread|loaf|bun|baguette|sourdough|roll/.test(t)) return "bread";
+  return "other";
+}
+function iconTile(kind) {
+  const [bg, art] = ICONS[kind] || ICONS.other;
+  const wrap = document.createElement("span");
+  wrap.className = "ph";
+  wrap.style.background = bg;
+  wrap.innerHTML = '<svg viewBox="0 0 64 64" role="img" aria-hidden="true"><rect width="64" height="64" fill="' + bg + '"/>' + art + '</svg>';   // fixed drawings above, never customer text
+  return wrap;
+}
+const goodImage = u => typeof u === "string" && /^(https:\/\/[^\s"'<>]+|images\/[A-Za-z0-9._\/-]+)$/.test(u) && !u.includes("..");
+function productPicture(p) {
+  const fallback = iconTile(iconKind(p.cat, p.name));
+  if (!goodImage(p.img)) return fallback;
+  const im = document.createElement("img");
+  im.className = "ph"; im.alt = p.name; im.loading = "lazy"; im.src = p.img;
+  im.onerror = () => im.replaceWith(fallback);
+  return im;
+}
+function renderHero() {
+  $("heroTitle").textContent = HERO_TITLE; $("heroText").textContent = HERO_TEXT;
+  $("heroArt").innerHTML = "";
+  ["pastry", "bread", "cake"].forEach(k => $("heroArt").appendChild(iconTile(k)));
+}
+
+const getCategories = () => ["All", ...new Set(PRODUCTS.map(p => p.cat))];
+
+function renderCats() {
+  $("cats").innerHTML = "";
+  const categories = getCategories();
+  if (!categories.includes(activeCat)) activeCat = "All";
+  categories.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "cat" + (c === activeCat ? " active" : "");
+    b.textContent = c;
+    b.onclick = () => { activeCat = c; renderCats(); renderList(); };
+    $("cats").appendChild(b);
+  });
+}
+
+function renderList() {
+  const q = $("search").value.trim().toLowerCase();
+  const items = PRODUCTS.filter(p =>
+    (activeCat === "All" || p.cat === activeCat) &&
+    (!q || p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)));
+  $("title").textContent = activeCat === "All" ? "All products" : activeCat;
+  const list = $("list");
+  list.innerHTML = "";
+  if (!items.length) { list.innerHTML = '<div class="empty">No products found.</div>'; return; }
+  items.forEach(p => {
+    const row = document.createElement("div");
+    row.className = "product";
+    row.innerHTML =
+      '<div class="pic"></div><div><div class="p-name"></div><div class="p-meta"></div><div class="p-price"></div></div>' +
+      '<div class="stepper"><button aria-label="Remove one">−</button><input class="qty" inputmode="numeric" aria-label="Quantity"><button aria-label="Add one">+</button><button class="quick" data-n="5">+5</button><button class="quick" data-n="10">+10</button></div>';
+    row.querySelector(".pic").replaceWith(productPicture(p));
+    row.querySelector(".p-name").textContent = p.name;
+    row.querySelector(".p-meta").textContent = p.code + " · " + p.pack;
+    row.querySelector(".p-price").textContent = money(p.price);
+    const qty = row.querySelector(".qty");
+    qty.value = cart.get(p.code) || 0;
+    row.classList.toggle("has", (cart.get(p.code) || 0) > 0);
+    if (!p.available) {
+      const so = document.createElement("span");
+      so.className = "soldout"; so.textContent = "Sold out";
+      row.querySelector(".stepper").replaceWith(so);
+    } else {
+      const [minus, plus] = row.querySelectorAll("button");
+      minus.onclick = () => change(p.code, -1, qty);
+      plus.onclick  = () => change(p.code, +1, qty);
+      row.querySelectorAll(".quick").forEach(b => { b.onclick = () => change(p.code, Number(b.dataset.n), qty); });
+      qty.onfocus = () => qty.select();
+      qty.onchange = () => { const v = parseInt(qty.value, 10); setQty(p.code, isNaN(v) ? 0 : v, qty); };
+    }
+    list.appendChild(row);
+  });
+}
+
+function setQty(code, value, qtyEl) {
+  const n = Math.min(999, Math.max(0, Math.floor(value)));
+  n ? cart.set(code, n) : cart.delete(code);
+  if (qtyEl) { qtyEl.value = n; const r = qtyEl.closest(".product"); if (r) r.classList.toggle("has", n > 0); }
+  renderOrder();
+}
+function change(code, d, qtyEl) { setQty(code, (cart.get(code) || 0) + d, qtyEl); }
+
+function orderRows() {
+  return PRODUCTS.filter(p => p.available && cart.has(p.code)).map(p => ({ p, qty: cart.get(p.code), sub: cart.get(p.code) * p.price }));
+}
+
+function addLine(container, left, right) {
+  const d = document.createElement("div");
+  d.className = "line";
+  const a = document.createElement("span"); a.textContent = left;
+  const b = document.createElement("span"); b.textContent = right;
+  d.append(a, b); container.appendChild(d);
+}
+
+function renderOrder() {
+  renderRepeat();
+  const rows = orderRows();
+  const total = rows.reduce((s, r) => s + r.sub, 0);
+  const items = rows.reduce((s, r) => s + r.qty, 0);
+  const label = items + (items === 1 ? " item" : " items");
+  $("count").textContent = label; $("mCount").textContent = label;
+  $("total").textContent = money(total); $("mTotal").textContent = money(total);
+  $("review").disabled = $("mReview").disabled = items === 0;
+  const lines = $("lines");
+  lines.innerHTML = "";
+  if (!rows.length) { lines.innerHTML = '<div class="empty">Your order is empty.</div>'; return; }
+  rows.forEach(r => addLine(lines, r.qty + " × " + r.p.name, money(r.sub)));
+}
+
+/* ---------- repeat last order ---------- */
+function savedCart() {
+  try { const a = JSON.parse(localStorage.getItem("lastCart") || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; }
+}
+function renderRepeat() {
+  const usable = savedCart().filter(([c, q]) => PRODUCTS.some(p => p.code === c && p.available) && q > 0);
+  const btn = $("repeatBtn");
+  btn.classList.toggle("show", usable.length > 0 && cart.size === 0);
+  btn.textContent = "↻ Repeat my last order (" + usable.length + (usable.length === 1 ? " product)" : " products)");
+}
+function repeatLast() {
+  savedCart().forEach(([c, q]) => { if (PRODUCTS.some(p => p.code === c && p.available) && q > 0) cart.set(c, Math.min(999, Math.floor(q))); });
+  renderList(); renderOrder();
+}
+
+/* ---------- page style ---------- */
+const STYLE_NAMES = { classic: "Classic", fast: "Fast order" };
+function setStyle(name) {
+  if (!STYLE_NAMES[name]) name = "classic";
+  document.body.classList.remove("style-classic", "style-fast");
+  document.body.classList.add("style-" + name);
+  document.querySelectorAll("#styles button").forEach(b => b.classList.toggle("on", b.dataset.style === name));
+  try { localStorage.setItem("style", name); } catch (e) {}
+}
+function initStyle() {
+  const box = $("styles");
+  if (SHOW_STYLE_SWITCHER) {
+    Object.keys(STYLE_NAMES).forEach(k => {
+      const b = document.createElement("button");
+      b.type = "button"; b.dataset.style = k; b.textContent = STYLE_NAMES[k];
+      b.onclick = () => setStyle(k);
+      box.appendChild(b);
+    });
+  }
+  let saved = null;
+  try { saved = SHOW_STYLE_SWITCHER ? localStorage.getItem("style") : null; } catch (e) {}
+  setStyle(saved || DEFAULT_STYLE);
+}
+
+/* ---------- order number ---------- */
+function makeRef() {
+  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";   // no 0/O/1/I so it is easy to read out loud
+  const d = new Date();
+  const yymmdd = String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
+  let tail = "";
+  for (let i = 0; i < 4; i++) tail += letters[Math.floor(Math.random() * letters.length)];
+  return ORDER_PREFIX + "-" + yymmdd + "-" + tail;
+}
+
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+
+/* ---------- order popup ---------- */
+function showForm() {
+  $("formView").style.display = "";
+  $("doneView").style.display = "none";
+  $("formError").classList.remove("show");
+}
+
+function openModal() {
+  const rows = orderRows();
+  const total = rows.reduce((s, r) => s + r.sub, 0);
+  const box = $("summary");
+  box.innerHTML = "";
+  rows.forEach(r => addLine(box, r.qty + " × " + r.p.name + " (" + r.p.pack + ")", money(r.sub)));
+  $("sTotal").textContent = money(total);
+  $("cDate").min = todayISO();
+  showForm();
+  $("modal").classList.add("open");
+}
+
+function formError(msg) {
+  const el = $("formError");
+  el.textContent = msg;
+  el.classList.add("show");
+}
+
+function validDetails() {
+  if ($("cName").value.trim().length < 2) { formError("Please enter your name."); return false; }
+  if ($("cPhone").value.replace(/\D/g, "").length < 8) { formError("Please enter a valid contact number."); return false; }
+  const date = $("cDate").value;
+  if (!date) { formError("Please choose a delivery date."); return false; }
+  if (date < todayISO()) { formError("The delivery date cannot be in the past."); return false; }
+  const email = $("cEmail").value.trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { formError("Please check your email address, or leave it empty."); return false; }
+  $("formError").classList.remove("show");
+  return true;
+}
+
+function buildPayload() {
+  return {
+    ref: currentRef,
+    customer: $("cName").value.trim(),
+    shop: $("cShop").value.trim(),
+    phone: $("cPhone").value.trim(),
+    email: $("cEmail").value.trim(),
+    deliveryDate: $("cDate").value,
+    website: $("cWebsite").value,                       // hidden trap field for bots
+    items: orderRows().map(r => ({ code: r.p.code, name: r.p.name, pack: r.p.pack, qty: r.qty, price: r.p.price }))
+  };
+}
+
+function orderText() {
+  const rows = orderRows();
+  const total = rows.reduce((s, r) => s + r.sub, 0);
+  return [
+    "NEW ORDER " + currentRef + " - " + BUSINESS_NAME,
+    "Customer: " + ($("cName").value || "-"),
+    "Shop: " + ($("cShop").value || "-"),
+    "Phone: " + ($("cPhone").value || "-"),
+    "Delivery date: " + ($("cDate").value || "-"),
+    "",
+    ...rows.map(r => r.qty + " x " + r.p.code + " " + r.p.name + " (" + r.p.pack + ") - " + money(r.sub)),
+    "",
+    "Total (indicative): " + money(total)
+  ].join("\n");
+}
+
+async function submitOrder() {
+  if (!validDetails()) return;
+  if (!SHEET_URL) { formError("Ordering is not set up yet."); return; }
+  if (!currentRef) currentRef = makeRef();
+  const body = JSON.stringify(buildPayload());
+  const btn = $("submitBtn");
+  btn.disabled = true; btn.textContent = "Submitting…";
+
+  let result;
+  try {
+    const res = await fetch(SHEET_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body });
+    result = await res.json();
+  } catch (e) {
+    /* The browser could not read the reply. Send once more without reading it.
+       The server ignores a repeated order number, so this can never create a double order. */
+    try {
+      await fetch(SHEET_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body });
+      result = { ok: true, unconfirmed: true };
+    } catch (e2) {
+      result = { ok: false, error: "No internet connection. Please try again." };
+    }
+  }
+
+  btn.disabled = false; btn.textContent = "Submit order";
+  if (!result || !result.ok) { formError((result && result.error) || "Something went wrong. Please try again."); return; }
+  showDone(result);
+}
+
+function showDone(result) {
+  lastOrderText = orderText();
+  try { localStorage.setItem("lastCart", JSON.stringify([...cart])); } catch (e) {}
+  $("doneRef").textContent = currentRef;
+  let text = result.unconfirmed
+    ? "Your order was sent. If it does not show under Track order within a few minutes, please WhatsApp the seller with this number."
+    : "The seller will contact you to confirm your order. Keep this number to check your status.";
+  if (result.emailSent) text += " We also emailed the order number to " + $("cEmail").value.trim() + ". If you cannot see it, please check your Junk/Spam folder and mark it as \"Not spam\".";
+  $("doneText").textContent = text;
+  try { localStorage.setItem("lastOrder", JSON.stringify({ ref: currentRef, phone: $("cPhone").value.trim() })); } catch (e) {}
+  $("formView").style.display = "none";
+  $("doneView").style.display = "";
+}
+
+function newOrder() {
+  cart.clear();
+  currentRef = null;
+  lastOrderText = "";
+  ["cName", "cShop", "cPhone", "cEmail", "cDate", "cWebsite"].forEach(id => { $(id).value = ""; });
+  renderList(); renderOrder();
+  $("modal").classList.remove("open");
+}
+
+/* ---------- tracking ---------- */
+function openTrack(ref, phone) {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem("lastOrder") || "{}"); } catch (e) {}
+  $("tRef").value = ref || saved.ref || "";
+  $("tPhone").value = phone || saved.phone || "";
+  $("fPhone").value = phone || saved.phone || "";
+  $("fDate").value = "";
+  $("findPanel").style.display = "none";
+  $("trackError").classList.remove("show");
+  $("trackResult").innerHTML = "";
+  $("trackModal").classList.add("open");
+}
+
+function trackError(msg) {
+  const el = $("trackError");
+  el.textContent = msg;
+  el.classList.add("show");
+}
+
+function row(label, value) {
+  const d = document.createElement("div");
+  d.className = "row";
+  const b = document.createElement("b"); b.textContent = label + ": ";
+  d.append(b, document.createTextNode(value));
+  return d;
+}
+
+function renderTrack(r, target) {
+  const out = target || $("trackResult");
+  if (!target) out.innerHTML = "";
+  const status = r.status || "Pending";
+
+  const badge = document.createElement("span");
+  badge.className = "badge" + (status === "Rejected" ? " bad" : (status === "Pending" ? "" : " ok"));
+  badge.textContent = "Status: " + status;
+  const help = document.createElement("p");
+  help.className = "small";
+  help.textContent = STATUS_HELP[status] || "";
+  out.append(badge, help);
+
+  if (status !== "Rejected") {
+    const idx = STATUS_FLOW.indexOf(status);
+    const ol = document.createElement("ol");
+    ol.className = "steps";
+    STATUS_FLOW.forEach((s, i) => {
+      const li = document.createElement("li");
+      li.className = i < idx || status === "Delivered" && i <= idx ? "done-step" : (i === idx ? "current" : "");
+      const dot = document.createElement("span"); dot.className = "dot";
+      li.append(dot, document.createTextNode(s));
+      ol.appendChild(li);
+    });
+    out.appendChild(ol);
+  }
+
+  if (r.note) {
+    const n = document.createElement("div");
+    n.className = "seller-note";
+    const b = document.createElement("b"); b.textContent = "Message from the seller: ";
+    n.append(b, document.createTextNode(r.note));
+    out.appendChild(n);
+  }
+  out.appendChild(row("Order number", r.ref));
+  if (r.deliveryDate) out.appendChild(row("Delivery date", r.deliveryDate));
+  if (r.items) out.appendChild(row("Items", r.items));
+  if (r.total != null) out.appendChild(row("Total (indicative)", money(r.total)));
+  if (r.updated) out.appendChild(row("Last update", r.updated));
+}
+
+async function trackOrder() {
+  const ref = $("tRef").value.trim().toUpperCase();
+  const phone = $("tPhone").value.replace(/\D/g, "");
+  $("trackError").classList.remove("show");
+  $("trackResult").innerHTML = "";
+  if (!ref) { trackError("Please enter your order number."); return; }
+  if (phone.length < 4) { trackError("Please enter the phone number used for the order."); return; }
+  if (!SHEET_URL) { trackError("Tracking is not set up yet."); return; }
+
+  const btn = $("trackBtn");
+  btn.disabled = true; btn.textContent = "Checking…";
+  try {
+    const res = await fetch(SHEET_URL + "?action=track&ref=" + encodeURIComponent(ref) + "&phone=" + encodeURIComponent(phone));
+    const data = await res.json();
+    if (data && data.ok) renderTrack(data);
+    else trackError((data && data.error) || "We could not find that order.");
+  } catch (e) {
+    trackError("Could not check right now. Please try again, or contact the seller.");
+  }
+  btn.disabled = false; btn.textContent = "Check status";
+}
+
+/* For customers who forgot the order number: phone number + delivery date. */
+async function findOrders() {
+  const phone = $("fPhone").value.replace(/\D/g, "");
+  const date = $("fDate").value;
+  $("trackError").classList.remove("show");
+  $("trackResult").innerHTML = "";
+  if (phone.length < 8) { trackError("Please enter the phone number used for the order."); return; }
+  if (!date) { trackError("Please choose the delivery date of the order."); return; }
+  if (!SHEET_URL) { trackError("Tracking is not set up yet."); return; }
+
+  const btn = $("findBtn");
+  btn.disabled = true; btn.textContent = "Searching…";
+  try {
+    const res = await fetch(SHEET_URL + "?action=find&phone=" + encodeURIComponent(phone) + "&date=" + encodeURIComponent(date));
+    const data = await res.json();
+    if (data && data.ok && data.orders && data.orders.length) {
+      const out = $("trackResult");
+      data.orders.forEach((o, i) => {
+        if (i) out.appendChild(document.createElement("hr")).className = "divider";
+        const box = document.createElement("div");
+        out.appendChild(box);
+        renderTrack(o, box);
+      });
+    } else {
+      trackError((data && data.error) || "We could not find an order for that phone number and delivery date.");
+    }
+  } catch (e) {
+    trackError("Could not search right now. Please try again, or contact the seller.");
+  }
+  btn.disabled = false; btn.textContent = "Find my order";
+}
+
+/* ---------- product list from the sheet ---------- */
+function applyProducts(list) {
+  if (!Array.isArray(list) || !list.length) return false;
+  PRODUCTS = list.map(p => ({
+    code: String(p.code), name: String(p.name), pack: String(p.pack || ""),
+    price: Number(p.price) || 0, cat: String(p.cat || "Other"), available: p.available !== false,
+    img: goodImage(p.img) ? p.img : ""
+  }));
+  for (const code of [...cart.keys()]) {          // drop anything removed or sold out meanwhile
+    const p = PRODUCTS.find(x => x.code === code);
+    if (!p || !p.available) cart.delete(code);
+  }
+  return true;
+}
+
+async function loadProducts() {
+  try {                                           // show the last list instantly, then refresh it
+    const cached = JSON.parse(localStorage.getItem("products") || "null");
+    if (applyProducts(cached)) { renderCats(); renderList(); renderOrder(); }
+  } catch (e) {}
+  if (!SHEET_URL) return;
+  try {
+    const res = await fetch(SHEET_URL + "?action=products");
+    const data = await res.json();
+    if (data && data.ok && applyProducts(data.products)) {
+      try { localStorage.setItem("products", JSON.stringify(data.products)); } catch (e) {}
+      renderCats(); renderList(); renderOrder();
+    }
+  } catch (e) {}                                  // offline: keep what is on screen
+}
+
+/* ---------- owner screen ---------- */
+let ownerPassword = "";
+
+async function ownerCall(payload) {
+  const res = await fetch(SHEET_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+  return res.json();
+}
+
+function ownerRow(p) {
+  const r = document.createElement("div");
+  r.className = "arow";
+  r.dataset.code = p.code;
+  const mk = (cls, ph, val, type) => {
+    const i = document.createElement("input");
+    i.className = cls; i.placeholder = ph; i.type = type || "text"; i.value = val;
+    if (type === "number") { i.step = "0.01"; i.min = "0"; i.inputMode = "decimal"; }
+    return i;
+  };
+  const name = mk("name", "Product name", p.name);
+  const pack = mk("pack", "e.g. 12 pcs", p.pack);
+  const price = mk("price", "0.00", p.price === "" ? "" : Number(p.price).toFixed(2), "number");
+  const cat = mk("cat", "Category", p.cat); cat.setAttribute("list", "catList");
+  const lab = document.createElement("label");
+  const chk = document.createElement("input"); chk.type = "checkbox"; chk.className = "avail"; chk.checked = p.available !== false;
+  lab.append(chk, "In stock");
+  const del = document.createElement("button");
+  del.type = "button"; del.className = "del"; del.textContent = "×"; del.title = "Remove this product";
+  del.onclick = () => r.remove();
+  const img = mk("img", "Photo address (optional), e.g. images/loaf.jpg or https://…", p.img || "");
+  img.style.gridColumn = "1 / -1";
+  r.append(name, pack, price, cat, lab, del, img);
+  return r;
+}
+
+function ownerFill() {
+  const rows = $("oRows");
+  rows.innerHTML = "";
+  PRODUCTS.forEach(p => rows.appendChild(ownerRow(p)));
+  $("catList").innerHTML = "";
+  [...new Set(PRODUCTS.map(p => p.cat))].forEach(c => { const o = document.createElement("option"); o.value = c; $("catList").appendChild(o); });
+}
+
+function nextCode(used) {
+  let n = used.size + 1, code;
+  do { code = ORDER_PREFIX + "-NEW-" + String(n++).padStart(3, "0"); } while (used.has(code));
+  return code;
+}
+
+function ownerCollect() {
+  const used = new Set([...$("oRows").children].map(r => r.dataset.code).filter(Boolean));
+  return [...$("oRows").children].map(r => {
+    if (!r.dataset.code) { r.dataset.code = nextCode(used); used.add(r.dataset.code); }
+    return {
+      code: r.dataset.code,
+      name: r.querySelector(".name").value.trim(),
+      pack: r.querySelector(".pack").value.trim(),
+      price: r.querySelector(".price").value,
+      cat: r.querySelector(".cat").value.trim() || "Other",
+      available: r.querySelector(".avail").checked,
+      img: r.querySelector(".img").value.trim()
+    };
+  });
+}
+
+function ownerMsg(el, text) { el.textContent = text; el.classList.add("show"); }
+
+async function ownerLogin() {
+  const pw = $("oPass").value;
+  $("oLoginError").classList.remove("show");
+  if (!pw) { ownerMsg($("oLoginError"), "Please enter the owner password."); return; }
+  if (!SHEET_URL) { ownerMsg($("oLoginError"), "The shop is not connected to its sheet yet."); return; }
+  const btn = $("oLoginBtn"); btn.disabled = true; btn.textContent = "Checking…";
+  try {
+    const data = await ownerCall({ action: "admin_login", password: pw });
+    if (data && data.ok) {
+      ownerPassword = pw; $("oPass").value = "";
+      ownerFill();
+      $("ownerLogin").style.display = "none"; $("ownerEdit").style.display = "";
+    } else ownerMsg($("oLoginError"), (data && data.error) || "Could not log in.");
+  } catch (e) { ownerMsg($("oLoginError"), "Could not connect. Please try again."); }
+  btn.disabled = false; btn.textContent = "Log in";
+}
+
+async function ownerSave() {
+  $("oError").classList.remove("show"); $("oOk").classList.remove("show");
+  const list = ownerCollect();
+  for (let k = 0; k < list.length; k++) {
+    if (!list[k].name) { ownerMsg($("oError"), "Row " + (k + 1) + ": please enter a product name."); return; }
+    if (list[k].price === "" || !(Number(list[k].price) >= 0)) { ownerMsg($("oError"), "Row " + (k + 1) + " (" + list[k].name + "): please enter a price."); return; }
+  }
+  if (!list.length) { ownerMsg($("oError"), "Add at least one product first."); return; }
+  const btn = $("oSave"); btn.disabled = true; btn.textContent = "Saving…";
+  try {
+    const data = await ownerCall({ action: "admin_save", password: ownerPassword, products: list });
+    if (data && data.ok) {
+      applyProducts(list);
+      try { localStorage.setItem("products", JSON.stringify(PRODUCTS)); } catch (e) {}
+      renderCats(); renderList(); renderOrder(); ownerFill();
+      ownerMsg($("oOk"), "Saved. Customers will see the new list now.");
+    } else ownerMsg($("oError"), (data && data.error) || "Could not save. Please try again.");
+  } catch (e) { ownerMsg($("oError"), "Could not connect. Please try again."); }
+  btn.disabled = false; btn.textContent = "Save changes";
+}
+
+function ownerClose() {
+  ownerPassword = "";
+  $("ownerModal").classList.remove("open");
+  $("ownerLogin").style.display = ""; $("ownerEdit").style.display = "none";
+}
+
+/* ---------- events ---------- */
+$("repeatBtn").onclick = repeatLast;
+$("openOwner").onclick = () => { $("oLoginError").classList.remove("show"); $("ownerModal").classList.add("open"); };
+$("oLoginBtn").onclick = ownerLogin;
+$("oPass").addEventListener("keydown", e => { if (e.key === "Enter") ownerLogin(); });
+$("oCloseLogin").onclick = $("oLogout").onclick = ownerClose;
+$("oAdd").onclick = () => { const r = ownerRow({ code: "", name: "", pack: "", price: "", cat: "", available: true, img: "" }); $("oRows").appendChild(r); r.querySelector(".name").focus(); };
+$("oSave").onclick = ownerSave;
+$("review").onclick = $("mReview").onclick = openModal;
+$("submitBtn").onclick = submitOrder;
+$("closeModal").onclick = () => $("modal").classList.remove("open");
+$("modal").onclick = e => { if (e.target === $("modal")) $("modal").classList.remove("open"); };
+$("doneTrack").onclick = () => { $("modal").classList.remove("open"); openTrack(currentRef, $("cPhone").value.trim()); };
+$("newOrder").onclick = newOrder;
+$("sendWa").onclick = () => window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(lastOrderText), "_blank", "noopener");
+$("sendMail").onclick = () => { window.location.href = "mailto:" + ORDER_EMAIL + "?subject=" + encodeURIComponent("New order " + currentRef + " - " + BUSINESS_NAME) + "&body=" + encodeURIComponent(lastOrderText); };
+$("openTrack").onclick = () => openTrack();
+$("trackBtn").onclick = trackOrder;
+$("forgotLink").onclick = () => { const p = $("findPanel"); p.style.display = p.style.display === "none" ? "" : "none"; };
+$("findBtn").onclick = findOrders;
+$("closeTrack").onclick = () => $("trackModal").classList.remove("open");
+$("trackModal").onclick = e => { if (e.target === $("trackModal")) $("trackModal").classList.remove("open"); };
+$("search").addEventListener("input", renderList);
+
+initStyle(); renderHero(); renderCats(); renderList(); renderOrder();
+loadProducts();
+</script>
+</body>
+</html>
