@@ -125,6 +125,52 @@ h1 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-siz
 .repeat { display: none; width: 100%; margin: 0 0 12px; padding: 12px 14px; border: 1px dashed var(--gold); background: transparent; color: inherit; border-radius: 12px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-align: left; }
 .repeat.show { display: block; }
 
+/* ---- Style: Premium (dark, gold, big picture cards) ---- */
+body.style-premium { --cream: var(--bg); --white: var(--sf); --line: var(--ln); --muted: var(--mt); --dark: var(--bg2); --gold: var(--ac); background: var(--bg); color: var(--tx); }
+.style-premium .topbar { background: var(--bg2); border-bottom: 1px solid var(--ln); color: var(--tx); }
+.style-premium .search input { background: var(--sf); border-color: var(--ln2); color: var(--tx); }
+.style-premium .track-link { color: var(--tx); border-color: var(--ln2); }
+.style-premium .styles button.on { background: var(--bg2); color: var(--hd); border-color: var(--bg2); }
+.style-premium .demo-banner { color: var(--act); }
+.style-premium .hero { background: radial-gradient(circle at 80% 20%, var(--glow) 0%, var(--bg2) 55%, var(--bg2) 100%); padding: 40px 32px; }
+.style-premium .hero h2 { font-size: 42px; color: var(--hd); }
+.style-premium .cat { color: var(--tx); background: transparent; border-color: var(--ln2); }
+.style-premium .cat.active { background: var(--gold); color: var(--act); border-color: var(--gold); }
+.style-premium h1, .style-premium .p-name { color: var(--hd); }
+.style-premium .layout { max-width: 1320px; grid-template-columns: 1fr 330px; }
+.style-premium #list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+.style-premium .product { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; margin: 0; border-radius: 18px; border: 1px solid var(--ln); background: linear-gradient(180deg, var(--c1), var(--c2)); }
+.style-premium .product:hover { border-color: var(--gold); }
+.style-premium .product .ph { width: 100%; height: auto; aspect-ratio: 4 / 3; border-radius: 12px; }
+.style-premium .p-price { font-family: 'Instrument Serif', Georgia, serif; font-size: 22px; color: var(--gold); margin-top: 6px; }
+.style-premium .stepper { justify-content: space-between; }
+.style-premium .stepper button { background: var(--bg); color: var(--tx); border-color: var(--ln2); }
+.style-premium .stepper button:hover { background: var(--gold); color: var(--act); }
+.style-premium .stepper .qty { background: var(--bg); border-color: var(--ln2); }
+.style-premium .soldout { text-align: center; padding: 8px 0; }
+.style-premium .btn.primary, .style-premium .mobile-bar button { background: var(--gold); color: var(--act); }
+.style-premium .btn.alt { background: transparent; color: var(--tx); border-color: var(--ln2); }
+.style-premium .btn.close { color: var(--mt); }
+.style-premium .box input { background: var(--bg); color: var(--tx); border-color: var(--ln2); }
+.style-premium .policy, .style-premium .seller-note, .style-premium .error, .style-premium .ok-msg, .style-premium .badge { color: var(--bg2); }
+.style-premium .error { color: var(--red); }
+.style-premium .badge.ok { color: #14703C; } .style-premium .badge.bad { color: var(--red); }
+.style-premium .refbox .ref, .style-premium .total .amt, .style-premium .panel h2 { color: var(--hd); }
+.style-premium .foot .linkbtn, .style-premium .linkbtn { color: var(--lk); }
+.style-premium .steps li.done-step, .style-premium .steps li.current { color: var(--tx); }
+.style-premium .steps li .dot { background: var(--bg); }
+.style-premium .mobile-bar { color: var(--tx); background: var(--bg2); border-top: 1px solid var(--ln); }
+
+/* Premium colour themes (premium style only) */
+body.style-premium { --bg:#14110D; --bg2:#0B0906; --sf:#1F1A14; --c1:#241E17; --c2:#1A150F; --ln:#3A3128; --ln2:#4A3F32; --tx:#F3EAD6; --hd:#F6E7B5; --mt:#A99B7C; --ac:#D4A92C; --act:#1A140C; --lk:#C9A64A; --glow:#6B4B14; }
+body.style-premium.theme-forest { --bg:#0F1A15; --bg2:#08110D; --sf:#16241D; --c1:#1A2B22; --c2:#13211A; --ln:#2B4236; --ln2:#3A5A4A; --tx:#EEF3EA; --hd:#DDEBD0; --mt:#93AA9A; --ac:#C98B4B; --act:#1A100A; --lk:#D9A66B; --glow:#2F5A44; }
+body.style-premium.theme-plum   { --bg:#1B0F17; --bg2:#12080F; --sf:#26151F; --c1:#2D1A26; --c2:#221320; --ln:#4A2B3C; --ln2:#5E3A4E; --tx:#F6E9EE; --hd:#F7D9E2; --mt:#B79AA8; --ac:#E3A6B4; --act:#2A0F18; --lk:#E8B4C0; --glow:#7A2E4C; }
+body.style-premium.theme-navy   { --bg:#0E1626; --bg2:#080E1A; --sf:#152238; --c1:#192842; --c2:#121D31; --ln:#27395A; --ln2:#364C75; --tx:#EAF0FA; --hd:#E6DDBF; --mt:#8FA2C2; --ac:#C8B27A; --act:#14110A; --lk:#D8C48E; --glow:#2E4A82; }
+.themes { display: none; gap: 5px; margin-left: 10px; vertical-align: middle; }
+.style-premium .themes { display: inline-flex; }
+.themes button { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,.7); padding: 0; cursor: pointer; }
+.themes button.on { outline: 2px solid #2A2118; outline-offset: 1px; }
+
 /* ---- Style: Fast order (compact list, type quantities, quick +5 / +10) ---- */
 .style-fast .hero { display: none; }
 .style-fast .layout { max-width: 1320px; padding-top: 10px; }
@@ -158,6 +204,7 @@ h1 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-siz
 @media (max-width: 720px) { .hero { padding: 18px 16px; } .hero h2 { font-size: 24px; } .hero-art { display: none; } }
 @media (max-width: 720px) { .arow { grid-template-columns: 1fr 1fr; } .arow .name { grid-column: 1 / -1; } .ahead { display: none; } }
 
+@media (max-width: 600px) { .style-premium #list { grid-template-columns: repeat(2, 1fr); gap: 10px; } .style-premium .hero h2 { font-size: 26px; } .style-premium .hero { padding: 22px 16px; } }
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr; }
   .panel { display: none; }
@@ -169,7 +216,7 @@ h1 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-siz
 </head>
 <body>
 
-<div class="demo-banner">DEMO — sample products and prices only. This is not a real shop.<span class="styles" id="styles" aria-label="Page style"></span></div>
+<div class="demo-banner">DEMO — sample products and prices only. This is not a real shop.<span class="styles" id="styles" aria-label="Page style"></span><span class="themes" id="themes" aria-label="Colour"></span></div>
 
 <header class="topbar">
   <div class="brand">
@@ -311,8 +358,9 @@ const ORDER_PREFIX    = "SB";                   // 2-5 capital letters, start of
 const WHATSAPP_NUMBER = "60100000000";          // placeholder - digits only, with country code
 const ORDER_EMAIL     = "orders@example.com";   // placeholder
 const CURRENCY        = "RM";
-const DEFAULT_STYLE   = "classic";              // "classic" or "fast"
-const SHOW_STYLE_SWITCHER = true;               // true: visitors can try both looks (good for demos). Set false for a real client.
+const DEFAULT_STYLE   = "classic";              // "classic", "premium" or "fast"
+const PREMIUM_THEME   = "gold";                 // colours for the premium style: "gold", "forest", "plum" or "navy"
+const SHOW_STYLE_SWITCHER = true;               // true: visitors can try all the looks (good for demos). Set false for a real client.
 const HERO_TITLE      = "Fresh from the oven, delivered to your shop.";
 const HERO_TEXT       = "Pick your products, send your order, and follow it step by step until it arrives.";
 const SHEET_URL       = "https://script.google.com/macros/s/AKfycbzeTUlZB0HvX9J_KqE_eYzlmJzGrWOz9ug0F2YMHUjTxl1jJJZcjcVR__uk28kaicE3/exec"; // Google Apps Script web app (see apps-script/Code.gs)
@@ -500,10 +548,18 @@ function repeatLast() {
 }
 
 /* ---------- page style ---------- */
-const STYLE_NAMES = { classic: "Classic", fast: "Fast order" };
+const STYLE_NAMES = { classic: "Classic", premium: "Premium", fast: "Fast order" };
+const THEMES = { gold: ["Black & gold", "#D4A92C"], forest: ["Forest & copper", "#C98B4B"], plum: ["Plum & rose", "#E3A6B4"], navy: ["Navy & champagne", "#C8B27A"] };
+function setTheme(name) {
+  if (!THEMES[name]) name = "gold";
+  Object.keys(THEMES).forEach(k => document.body.classList.remove("theme-" + k));
+  document.body.classList.add("theme-" + name);
+  document.querySelectorAll("#themes button").forEach(b => b.classList.toggle("on", b.dataset.theme === name));
+  try { localStorage.setItem("theme", name); } catch (e) {}
+}
 function setStyle(name) {
   if (!STYLE_NAMES[name]) name = "classic";
-  document.body.classList.remove("style-classic", "style-fast");
+  document.body.classList.remove("style-classic", "style-premium", "style-fast");
   document.body.classList.add("style-" + name);
   document.querySelectorAll("#styles button").forEach(b => b.classList.toggle("on", b.dataset.style === name));
   try { localStorage.setItem("style", name); } catch (e) {}
@@ -517,7 +573,17 @@ function initStyle() {
       b.onclick = () => setStyle(k);
       box.appendChild(b);
     });
+    Object.keys(THEMES).forEach(k => {
+      const b = document.createElement("button");
+      b.type = "button"; b.dataset.theme = k; b.title = THEMES[k][0]; b.setAttribute("aria-label", THEMES[k][0]);
+      b.style.background = THEMES[k][1];
+      b.onclick = () => setTheme(k);
+      $("themes").appendChild(b);
+    });
   }
+  let savedTheme = null;
+  try { savedTheme = SHOW_STYLE_SWITCHER ? localStorage.getItem("theme") : null; } catch (e) {}
+  setTheme(savedTheme || PREMIUM_THEME);
   let saved = null;
   try { saved = SHOW_STYLE_SWITCHER ? localStorage.getItem("style") : null; } catch (e) {}
   setStyle(saved || DEFAULT_STYLE);
