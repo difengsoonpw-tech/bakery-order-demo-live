@@ -432,7 +432,7 @@ body.style-premium.theme-navy   { --bg:#0E1626; --bg2:#080E1A; --sf:#152238; --c
           <div class="oempty hide" id="oNone">No product matches your search.</div>
         </div>
         <div class="opane" id="paneO">
-          <p class="small" style="margin:0 0 12px;max-width:640px;">Offers apply by themselves on the order page. Customers see them and the server works out the price, so nobody can change it. Each product gets its best single offer, then the best spend offer applies to the whole order.</p>
+          <p class="small" style="margin:0 0 12px;max-width:640px;">Offers apply by themselves on the order page. Customers see them and the server works out the price, so nobody can change it. Each product gets its best single offer, then the best spend offer applies to the whole order. For <b>Buy some, get some free</b>, choose <b>Category</b> or <b>All products</b> in Applies to and customers can mix different products. The cheapest ones are free.</p>
           <div class="otools"><button class="addbtn" id="pAdd">+ Add offer</button></div>
           <div id="pRows"></div>
           <div class="oempty" id="pNone">No offers yet. Press <b>Add offer</b> to create your first one.</div>
@@ -660,15 +660,27 @@ function promoMatches(applies, line) {
 function priceOrder(lines, promos) {
   const r2 = n => Math.round(n * 100) / 100;
   const out = [], applied = [];
+  // Buy-and-get-free offers count every matching unit in the cart together (mix and match); the cheapest units are the free ones.
+  const mix = promos.map(function (p) {
+    const sv = lines.map(function () { return 0; });
+    if (p.type !== "buyget" || !(p.min >= 1 && p.value >= 1)) return sv;
+    const idx = [];
+    let total = 0;
+    lines.forEach(function (l, i) { if (promoMatches(p.applies, l)) { idx.push(i); total += l.qty; } });
+    let free = Math.floor(total / (p.min + p.value)) * p.value;
+    idx.sort(function (a, b) { return lines[a].price - lines[b].price || a - b; });
+    idx.forEach(function (i) { const n = Math.min(free, lines[i].qty); free -= n; sv[i] = n * lines[i].price; });
+    return sv;
+  });
   let subtotal = 0, lineDiscount = 0;
-  lines.forEach(l => {
+  lines.forEach((l, li) => {
     const gross = r2(l.price * l.qty);
     let best = 0, bestName = "";
-    promos.forEach(p => {
+    promos.forEach((p, pi) => {
       if (p.type === "spend" || p.type === "spendpct" || !promoMatches(p.applies, l)) return;
       let save = 0;
       if (p.type === "percent" && l.qty >= Math.max(1, p.min)) save = gross * p.value / 100;
-      if (p.type === "buyget" && p.min >= 1 && p.value >= 1) save = Math.floor(l.qty / (p.min + p.value)) * p.value * l.price;
+      if (p.type === "buyget") save = mix[pi][li];
       save = Math.min(gross, r2(save));
       if (save > best) { best = save; bestName = p.name; }
     });
@@ -707,6 +719,7 @@ function describePromo(p, withTarget) {
     else if (a.indexOf("CAT:") === 0) t += " on " + a.slice(4);
     else { const pr = PRODUCTS.find(x => x.code.toUpperCase() === a.slice(5).toUpperCase()); t += " on " + (pr ? pr.name : a.slice(5)); }
   }
+  if (withTarget && p.type === "buyget" && String(p.applies || "ALL").indexOf("CODE:") !== 0) t += ", mix and match (the cheapest is free)";
   if (p.until) t += " (until " + plainDate(p.until) + ")";
   return t;
 }
