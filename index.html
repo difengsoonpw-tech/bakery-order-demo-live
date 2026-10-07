@@ -276,6 +276,29 @@ body.style-premium.theme-navy   { --bg:#0E1626; --bg2:#080E1A; --sf:#152238; --c
 .osave .state.dirty { color: #B45F06; font-weight: 700; }
 .osave .btn { width: auto; padding: 0 28px; margin: 0; }
 .osave .msgs { max-width: 980px; margin: 0 auto; }
+
+/* The shop manager always uses its own light colours, whatever look the shop page is using */
+.modal.console { --cream: #FBF7EF; --white: #FFFFFF; --line: #E8DFCC; --muted: #8A7B5C; --dark: #2A2118; --gold: #D4A92C; color: #2A2118; }
+.style-premium .modal.console .box { background: #FBF7EF; color: #2A2118; }
+.style-premium .modal.console .box input, .style-premium .modal.console .box select { background: #FFFFFF; color: #2A2118; border-color: #E8DFCC; }
+.style-premium .modal.console .box input::placeholder { color: #9A8B6B; }
+.style-premium .modal.console .box h3 { color: #2A2118; }
+.style-premium .modal.console .ohead h3 { color: #FBF7EF; }
+.style-premium .modal.console .btn.primary, .style-premium .modal.console .addbtn { background: #2A2118; color: #FBF7EF; }
+.style-premium .modal.console .btn.close { color: #8A7B5C; }
+.style-premium .modal.console .ohead .out { color: #FBF7EF; border-color: #6A5C4A; background: transparent; }
+.style-premium .modal.console .otabs button { color: #BFAE8A; background: transparent; }
+.style-premium .modal.console .otabs button.on { background: #FBF7EF; color: #2A2118; }
+.style-premium .modal.console .otabs .n { background: #4A3F32; color: #FBF7EF; }
+.style-premium .modal.console .otabs .on .n { background: #D4A92C; color: #2A2118; }
+.style-premium .modal.console .arow, .style-premium .modal.console .pbox, .style-premium .modal.console .lock, .style-premium .modal.console .osave, .style-premium .modal.console .ochip { background: #FFFFFF; color: #2A2118; }
+.style-premium .modal.console .arow.off { background: #FAF6EC; }
+.style-premium .modal.console .small, .style-premium .modal.console .osave .state { color: #8A7B5C; }
+.style-premium .modal.console .osave .state.dirty { color: #B45F06; }
+.style-premium .modal.console .ochip.g { background: #E6F5EC; color: #14703C; } .style-premium .modal.console .ochip.r { background: #FDECEA; color: #C0392B; } .style-premium .modal.console .ochip.y { background: #FFF1C9; color: #7A5B00; }
+.style-premium .modal.console .pbox .phint { background: #FFF6DD; color: #5C4500; }
+.style-premium .modal.console .error { background: #FDECEA; color: #C0392B; } .style-premium .modal.console .ok-msg { background: #DDF3E6; color: #14703C; }
+.style-premium .modal.console .oempty { background: #fff; color: #8A7B5C; }
 .osave .error, .osave .ok-msg { margin: 0 0 8px; }
 @media (max-width: 760px) { .ogrid { grid-template-columns: 1fr; } .ohead { padding: 12px 14px 0; } .obody { padding: 14px; } .osave { padding-left: 14px; padding-right: 14px; } .osave .state { display: none; } .osave .btn { flex: 1; } .pbox .ptype-f, .pbox .papplies-f { grid-column: 1 / -1; } }
 @media (max-width: 720px) { .hero { padding: 18px 16px; } .hero h2 { font-size: 24px; } .hero-art { display: none; } }
