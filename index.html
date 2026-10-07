@@ -265,7 +265,7 @@ body.style-premium.theme-navy   { --bg:#0E1626; --bg2:#080E1A; --sf:#152238; --c
 .hide { display: none !important; }
 .pbox { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px 10px; align-items: end; }
 .pbox .pname-f { grid-column: 1 / -1; } .pbox .pname-f input { font-weight: 700; font-size: 15px; }
-.pbox .ptype-f, .pbox .papplies-f { grid-column: span 3; }
+.pbox .ptype-f, .pbox .papplies-f, .pbox .pgive-f { grid-column: span 3; }
 .pbox .pmin-f, .pbox .pvalue-f, .pbox .pfrom-f, .pbox .puntil-f { grid-column: span 3; }
 .pbox .pfoot { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; border-top: 1px dashed var(--line); padding-top: 8px; }
 .pbox .phint { margin: 0; font-size: 13px; color: #5C4500; background: #FFF6DD; border-radius: 8px; padding: 6px 10px; grid-column: 1 / -1; }
@@ -300,7 +300,7 @@ body.style-premium.theme-navy   { --bg:#0E1626; --bg2:#080E1A; --sf:#152238; --c
 .style-premium .modal.console .error { background: #FDECEA; color: #C0392B; } .style-premium .modal.console .ok-msg { background: #DDF3E6; color: #14703C; }
 .style-premium .modal.console .oempty { background: #fff; color: #8A7B5C; }
 .osave .error, .osave .ok-msg { margin: 0 0 8px; }
-@media (max-width: 760px) { .ogrid { grid-template-columns: 1fr; } .ohead { padding: 12px 14px 0; } .obody { padding: 14px; } .osave { padding-left: 14px; padding-right: 14px; } .osave .state { display: none; } .osave .btn { flex: 1; } .pbox .ptype-f, .pbox .papplies-f { grid-column: 1 / -1; } }
+@media (max-width: 760px) { .ogrid { grid-template-columns: 1fr; } .ohead { padding: 12px 14px 0; } .obody { padding: 14px; } .osave { padding-left: 14px; padding-right: 14px; } .osave .state { display: none; } .osave .btn { flex: 1; } .pbox .ptype-f, .pbox .papplies-f, .pbox .pgive-f { grid-column: 1 / -1; } }
 @media (max-width: 720px) { .hero { padding: 18px 16px; } .hero h2 { font-size: 24px; } .hero-art { display: none; } }
 
 @media (max-width: 600px) { .style-premium #list { grid-template-columns: repeat(2, 1fr); gap: 10px; } .style-premium .hero h2 { font-size: 26px; } .style-premium .hero { padding: 22px 16px; } }
@@ -455,7 +455,7 @@ body.style-premium.theme-navy   { --bg:#0E1626; --bg2:#080E1A; --sf:#152238; --c
           <div class="oempty hide" id="oNone">No product matches your search.</div>
         </div>
         <div class="opane" id="paneO">
-          <p class="small" style="margin:0 0 12px;max-width:640px;">Offers apply by themselves on the order page. Customers see them and the server works out the price, so nobody can change it. Each product gets its best single offer, then the best spend offer applies to the whole order. For <b>Buy some, get some free</b>, choose <b>Category</b> or <b>All products</b> in Applies to and customers can mix different products. The cheapest ones are free.</p>
+          <p class="small" style="margin:0 0 12px;max-width:640px;">Offers apply by themselves on the order page. Customers see them and the server works out the price, so nobody can change it. Each product gets its best single offer, then the best spend offer applies to the whole order. For <b>Buy some, get some free</b>, pick what the customer buys, then pick the <b>Free item</b>: a specific product (for example buy any 2 Bread, get 1 Choc Cake free) or leave it on "the cheapest of the products they bought" so customers can mix.</p>
           <div class="otools"><button class="addbtn" id="pAdd">+ Add offer</button></div>
           <div id="pRows"></div>
           <div class="oempty" id="pNone">No offers yet. Press <b>Add offer</b> to create your first one.</div>
@@ -597,7 +597,7 @@ function renderList() {
     row.querySelector(".p-name").textContent = p.name;
     row.querySelector(".p-meta").textContent = p.code + " · " + p.pack;
     row.querySelector(".p-price").textContent = money(p.price);
-    PROMOS.filter(x => (x.type === "percent" || x.type === "buyget") && promoMatches(x.applies, p)).forEach(x => {
+    PROMOS.filter(x => (x.type === "percent" || x.type === "buyget") && (promoMatches(x.applies, p) || (x.give && x.give.toUpperCase() === p.code.toUpperCase()))).forEach(x => {
       const tg = document.createElement("span");
       tg.className = "tag"; tg.title = x.name; tg.textContent = "🏷 " + describePromo(x, false);
       row.querySelector(".p-price").appendChild(tg);
@@ -687,6 +687,14 @@ function priceOrder(lines, promos) {
   const mix = promos.map(function (p) {
     const sv = lines.map(function () { return 0; });
     if (p.type !== "buyget" || !(p.min >= 1 && p.value >= 1)) return sv;
+    if (p.give) {   // buy some of the products in "Applies to", get a chosen different product free
+      let gi = -1, pool = 0;
+      lines.forEach(function (l, i) { if (String(l.code).toUpperCase() === String(p.give).toUpperCase()) gi = i; });
+      if (gi < 0) return sv;
+      lines.forEach(function (l, i) { if (i !== gi && promoMatches(p.applies, l)) pool += l.qty; });
+      sv[gi] = Math.min(Math.floor(pool / p.min) * p.value, lines[gi].qty) * lines[gi].price;
+      return sv;
+    }
     const idx = [];
     let total = 0;
     lines.forEach(function (l, i) { if (promoMatches(p.applies, l)) { idx.push(i); total += l.qty; } });
@@ -700,7 +708,7 @@ function priceOrder(lines, promos) {
     const gross = r2(l.price * l.qty);
     let best = 0, bestName = "";
     promos.forEach((p, pi) => {
-      if (p.type === "spend" || p.type === "spendpct" || !promoMatches(p.applies, l)) return;
+      if (p.type === "spend" || p.type === "spendpct" || (p.type !== "buyget" && !promoMatches(p.applies, l))) return;
       let save = 0;
       if (p.type === "percent" && l.qty >= Math.max(1, p.min)) save = gross * p.value / 100;
       if (p.type === "buyget") save = mix[pi][li];
@@ -733,16 +741,24 @@ function describePromo(p, withTarget) {
   const m = n => money(n);
   let t = "";
   if (p.type === "percent") t = p.value + "% off" + (p.min > 1 ? " when you order " + p.min + " or more" : "");
-  if (p.type === "buyget") t = "Buy " + p.min + ", get " + p.value + " free";
+  if (p.type === "buyget") {
+    t = "Buy " + p.min + ", get " + p.value + " free";
+    if (p.give) {
+      const g = PRODUCTS.find(x => x.code.toUpperCase() === String(p.give).toUpperCase());
+      const a = String(p.applies || "ALL");
+      const src = a === "ALL" ? "any product" : a.indexOf("CAT:") === 0 ? a.slice(4) : ((PRODUCTS.find(x => x.code.toUpperCase() === a.slice(5).toUpperCase()) || {}).name || a.slice(5));
+      return "Buy " + p.min + " " + src + ", get " + p.value + " " + (g ? g.name : p.give) + " free" + (p.until ? " (until " + plainDate(p.until) + ")" : "");
+    }
+  }
   if (p.type === "spend") t = "Spend " + m(p.min) + " or more, save " + m(p.value);
   if (p.type === "spendpct") t = "Spend " + m(p.min) + " or more, save " + p.value + "%";
-  if (withTarget && (p.type === "percent" || p.type === "buyget")) {
+  if (withTarget && (p.type === "percent" || (p.type === "buyget" && !p.give))) {
     const a = String(p.applies || "ALL");
     if (a === "ALL") t += " on all products";
     else if (a.indexOf("CAT:") === 0) t += " on " + a.slice(4);
     else { const pr = PRODUCTS.find(x => x.code.toUpperCase() === a.slice(5).toUpperCase()); t += " on " + (pr ? pr.name : a.slice(5)); }
   }
-  if (withTarget && p.type === "buyget" && String(p.applies || "ALL").indexOf("CODE:") !== 0) t += ", mix and match (the cheapest is free)";
+  if (withTarget && p.type === "buyget" && !p.give && String(p.applies || "ALL").indexOf("CODE:") !== 0) t += ", mix and match (the cheapest is free)";
   if (p.until) t += " (until " + plainDate(p.until) + ")";
   return t;
 }
@@ -1081,7 +1097,7 @@ function applyProducts(list, promos, custom) {
   }));
   PROMOS = (Array.isArray(promos) ? promos : []).map(x => ({
     name: String(x.name), type: String(x.type), applies: String(x.applies || "ALL"),
-    min: Number(x.min) || 0, value: Number(x.value) || 0, until: x.until ? String(x.until) : ""
+    min: Number(x.min) || 0, value: Number(x.value) || 0, until: x.until ? String(x.until) : "", give: x.give ? String(x.give) : ""
   }));
   for (const code of [...cart.keys()]) {          // drop anything removed, unlisted or sold out meanwhile
     const p = PRODUCTS.find(x => x.code === code);
@@ -1311,6 +1327,17 @@ function promoRow(q) {
   };
   fillApplies();
   applies.addEventListener("focus", fillApplies);
+  const give = document.createElement("select"); give.className = "pgive";
+  const fillGive = () => {
+    const cur = give.value || q.give || "";
+    give.innerHTML = "";
+    const o0 = document.createElement("option"); o0.value = ""; o0.textContent = "The cheapest of the products they bought"; give.appendChild(o0);
+    ownerCollect().forEach(p => { const o = document.createElement("option"); o.value = p.code; o.textContent = p.name || p.code; give.appendChild(o); });
+    if (cur && ![...give.options].some(o => o.value === cur)) { const o = document.createElement("option"); o.value = cur; o.textContent = cur; give.appendChild(o); }
+    give.value = cur;
+  };
+  fillGive();
+  give.addEventListener("focus", fillGive);
   const min = inp("pmin", "", q.min, "number");
   const value = inp("pvalue", "", q.value, "number");
   const from = inp("pfrom", "", q.from, "date"), until = inp("puntil", "", q.until, "date");
@@ -1323,20 +1350,22 @@ function promoRow(q) {
   const del = document.createElement("button"); del.type = "button"; del.className = "del"; del.textContent = "Remove"; del.title = "Remove this offer";
   del.onclick = () => { box.remove(); ownerTouched(); };
   const hint = document.createElement("p"); hint.className = "phint";
-  const fMin = fld("", min, "pmin-f"), fVal = fld("", value, "pvalue-f"), fApp = fld("Applies to", applies, "papplies-f");
+  const fMin = fld("", min, "pmin-f"), fVal = fld("", value, "pvalue-f"), fApp = fld("Customer buys from", applies, "papplies-f"), fGive = fld("Free item", give, "pgive-f");
   const refresh = () => {
     const t = type.value;
     const pl = { percent: ["Minimum quantity (optional)", "Percent off"], buyget: ["Customer buys", "Gets free"], spend: ["Minimum order (" + CURRENCY + ")", CURRENCY + " off"], spendpct: ["Minimum order (" + CURRENCY + ")", "Percent off"] }[t];
     min.placeholder = pl[0]; value.placeholder = pl[1];
     fMin.firstChild.textContent = pl[0]; fVal.firstChild.textContent = pl[1];
     fApp.style.display = (t === "spend" || t === "spendpct") ? "none" : "";
-    const d = { name: name.value, type: t, applies: applies.value, min: Number(min.value) || 0, value: Number(value.value) || 0, until: until.value };
+    fGive.style.display = t === "buyget" ? "" : "none";
+    fApp.firstChild.textContent = t === "buyget" ? "Customer buys from" : "Applies to";
+    const d = { name: name.value, type: t, applies: applies.value, give: t === "buyget" ? give.value : "", min: Number(min.value) || 0, value: Number(value.value) || 0, until: until.value };
     hint.textContent = d.value > 0 ? "Customers see: " + describePromo(d, true) + (from.value ? " (from " + plainDate(from.value) + ")" : "") : "Fill in the amount to see how this offer reads.";
   };
-  [name, type, applies, min, value, from, until].forEach(e => { e.addEventListener("input", refresh); e.addEventListener("change", refresh); });
+  [name, type, applies, give, min, value, from, until].forEach(e => { e.addEventListener("input", refresh); e.addEventListener("change", refresh); });
   refresh();
   const foot = document.createElement("div"); foot.className = "pfoot"; foot.append(sw, del);
-  box.append(fld("Offer name", name, "pname-f"), fld("Type", type, "ptype-f"), fApp, fMin, fVal, fld("Starts on (empty = now)", from, "pfrom-f"), fld("Ends on (empty = no end)", until, "puntil-f"), hint, foot);
+  box.append(fld("Offer name", name, "pname-f"), fld("Type", type, "ptype-f"), fApp, fGive, fMin, fVal, fld("Starts on (empty = now)", from, "pfrom-f"), fld("Ends on (empty = no end)", until, "puntil-f"), hint, foot);
   box.addEventListener("input", ownerTouched); box.addEventListener("change", ownerTouched);
   return box;
 }
@@ -1344,6 +1373,7 @@ function promoCollect() {
   return [...$("pRows").children].map(b => ({
     name: b.querySelector(".pname").value.trim(),
     type: b.querySelector(".ptype").value,
+    give: b.querySelector(".ptype").value === "buyget" ? b.querySelector(".pgive").value : "",
     applies: ["spend", "spendpct"].includes(b.querySelector(".ptype").value) ? "ALL" : b.querySelector(".papplies").value,
     min: b.querySelector(".pmin").value === "" ? 0 : Number(b.querySelector(".pmin").value),
     value: Number(b.querySelector(".pvalue").value),
