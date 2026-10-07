@@ -195,39 +195,90 @@ body.style-premium.theme-navy   { --bg:#0E1626; --bg2:#080E1A; --sf:#152238; --c
 .offers div { margin: 2px 0; }
 .line.disc span { color: var(--green); font-weight: 700; }
 .line.disc { font-size: 12px; padding-left: 10px; }
-.arow .sched { grid-column: 1 / -1; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
-.arow .sched input { width: 140px; flex: none; height: 34px; }
-.arow .lstat { font-weight: 700; margin-left: auto; }
-.prow { display: grid; grid-template-columns: 1.4fr 1.1fr 1.4fr; gap: 6px; align-items: center; margin-bottom: 4px; }
-.prow2 { display: grid; grid-template-columns: .7fr .7fr 1fr 1fr auto auto; gap: 6px; align-items: center; margin-bottom: 4px; }
-.prow input, .prow select, .prow2 input { height: 36px; margin: 0; font-size: 13px; padding: 0 8px; width: 100%; border: 1px solid var(--line); border-radius: 8px; background: var(--white); color: inherit; font-family: inherit; }
-.prow2 label { font-size: 12px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-.prow2 input[type=checkbox] { width: 16px; height: 16px; }
-.phint { font-size: 12px; color: var(--muted); margin: 2px 0 0; }
-.pbox { border-bottom: 1px dashed var(--line); padding-bottom: 8px; margin-bottom: 8px; }
-.pbox .del { border: 0; background: transparent; color: var(--red); font-size: 20px; cursor: pointer; padding: 0 6px; }
-@media (max-width: 720px) { .prow { grid-template-columns: 1fr; } .prow2 { grid-template-columns: 1fr 1fr; } }
 .style-premium .tag { background: var(--c1); color: var(--lk); border: 1px solid var(--ln2); }
 .style-premium .offers { background: var(--c1); border-color: var(--ln2); color: var(--tx); }
 .foot { text-align: center; padding: 0 0 90px; }
 .foot .linkbtn { color: var(--muted); font-size: 12px; }
 .soldout { font-size: 13px; font-weight: 700; color: var(--red); }
-.admin-box { max-width: 720px; }
-.arow:not(.ahead) { padding-bottom: 8px; border-bottom: 1px dashed var(--line); }
-.arow { display: grid; grid-template-columns: 1.6fr 1fr .7fr 1fr auto auto; gap: 6px; align-items: center; margin-bottom: 6px; }
-.arow input { margin: 0; height: 38px; font-size: 13px; padding: 0 8px; }
-.arow label { font-size: 12px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-.arow input[type=checkbox] { width: 16px; height: 16px; margin: 0; }
-.arow .del { border: 0; background: transparent; color: var(--red); font-size: 20px; cursor: pointer; padding: 0 6px; }
-.arow .imgline { grid-column: 1 / -1; display: flex; gap: 6px; align-items: center; }
-.arow .imgline input { flex: 1; min-width: 0; }
-.arow .upl { flex-shrink: 0; height: 38px; border: 1px solid var(--line); background: var(--cream); color: inherit; border-radius: 10px; padding: 0 12px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
-.arow .thumb { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--line); }
-.ahead { font-size: 11px; color: var(--muted); }
 .ok-msg { background: #DDF3E6; border: 1px solid #A9DDBE; color: #14703C; border-radius: 10px; padding: 10px 12px; font-size: 13px; margin-top: 10px; display: none; }
 .ok-msg.show { display: block; }
+
+/* ---------- owner console ---------- */
+.modal.console { padding: 0; align-items: stretch; }
+.console .box { max-width: none; max-height: none; height: 100%; border-radius: 0; padding: 0; background: var(--cream); display: flex; flex-direction: column; }
+.console .box input { margin: 0; }
+.lock { margin: auto; width: min(380px, 92vw); background: var(--white); border: 1px solid var(--line); border-radius: 18px; padding: 28px 24px 18px; text-align: center; box-shadow: 0 18px 50px rgba(42,33,24,.18); }
+.lock img { width: 56px; height: 56px; border-radius: 14px; }
+.lock h3 { font-size: 28px; margin: 12px 0 4px; }
+.lock input { text-align: center; margin: 10px 0 0; }
+.oshell { display: none; flex-direction: column; min-height: 0; flex: 1; }
+.oshell.on { display: flex; }
+.ohead { background: var(--dark); color: var(--cream); padding: 14px 20px 0; }
+.ohead .top { display: flex; align-items: center; gap: 12px; max-width: 980px; margin: 0 auto; }
+.ohead h3 { color: var(--cream); font-size: 24px; margin: 0; flex: 1; }
+.ohead h3 small { display: block; font-family: Karla, sans-serif; font-size: 12px; color: #BFAE8A; margin-top: 2px; }
+.ohead .out { background: transparent; border: 1px solid #6A5C4A; color: var(--cream); border-radius: 999px; height: 34px; padding: 0 14px; font: inherit; font-size: 13px; cursor: pointer; }
+.otabs { display: flex; gap: 4px; max-width: 980px; margin: 14px auto 0; }
+.otabs button { border: 0; background: transparent; color: #BFAE8A; font: inherit; font-size: 15px; font-weight: 700; padding: 10px 18px; border-radius: 10px 10px 0 0; cursor: pointer; }
+.otabs button.on { background: var(--cream); color: var(--dark); }
+.otabs .n { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 6px; border-radius: 999px; background: #4A3F32; color: var(--cream); font-size: 12px; text-align: center; }
+.otabs .on .n { background: var(--gold); color: var(--dark); }
+.obody { flex: 1; overflow-y: auto; padding: 18px 20px 24px; }
+.opane { max-width: 980px; margin: 0 auto; display: none; }
+.opane.on { display: block; }
+.otools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.otools input[type=search] { flex: 1; min-width: 180px; height: 42px; border: 1px solid var(--line); border-radius: 999px; padding: 0 16px; font: inherit; font-size: 14px; background: var(--white); }
+.ochips { display: flex; gap: 6px; flex-wrap: wrap; }
+.ochip { font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: var(--white); border: 1px solid var(--line); color: var(--dark); }
+.ochip.g { color: #14703C; background: #E6F5EC; border-color: #BFE3CD; } .ochip.r { color: var(--red); background: #FDECEA; border-color: #F3B8B1; } .ochip.y { color: #7A5B00; background: #FFF1C9; border-color: #F0DDA0; }
+.addbtn { height: 42px; border: 0; border-radius: 999px; background: var(--dark); color: var(--cream); font: inherit; font-weight: 700; font-size: 14px; padding: 0 18px; cursor: pointer; }
+.ogrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.arow { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; grid-template-columns: 84px 1fr; gap: 6px 12px; align-content: start; position: relative; }
+.arow.off { background: #FAF6EC; }
+.arow.off .pic { filter: grayscale(.8); opacity: .7; }
+.arow .pic { grid-row: 1 / span 2; width: 84px; height: 84px; border-radius: 12px; background: var(--cream); border: 1px dashed var(--line); position: relative; overflow: hidden; cursor: pointer; padding: 0; display: block; }
+.arow .pic img.thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+.arow .pic .ph { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); gap: 2px; }
+.arow .pic .ph b { font-size: 22px; font-weight: 400; }
+.arow .pic .cam { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(42,33,24,.7); color: #fff; font-size: 11px; text-align: center; padding: 3px 0; }
+.arow .f { display: block; min-width: 0; }
+.arow .f > span, .pbox .f > span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+.arow input, .pbox input, .pbox select { width: 100%; height: 38px; border: 1px solid var(--line); border-radius: 9px; padding: 0 10px; font: inherit; font-size: 14px; background: var(--white); color: inherit; }
+.arow .w-nm input { font-weight: 700; font-size: 15px; }
+.arow .mid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 8px; grid-column: 1 / -1; }
+.arow .mid .w-cat, .arow .mid .w-img { grid-column: 1 / -1; }
+.arow .foot2 { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 2px; }
+.sw { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.sw input { position: absolute; opacity: 0; width: 0; height: 0; }
+.sw i { width: 38px; height: 22px; border-radius: 999px; background: #CFC4AB; position: relative; transition: background .15s; flex: none; }
+.sw i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.sw input:checked + i { background: var(--green); } .sw input:checked + i::after { transform: translateX(16px); }
+.sw input:focus-visible + i { outline: 2px solid var(--gold); outline-offset: 2px; }
+.arow .del, .pbox .del { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; margin-left: auto; padding: 6px 4px; }
+.arow .del:hover, .pbox .del:hover { color: var(--red); }
+.arow details { grid-column: 1 / -1; }
+.arow summary { font-size: 13px; color: var(--muted); cursor: pointer; display: flex; gap: 8px; align-items: center; list-style: none; }
+.arow summary::-webkit-details-marker { display: none; }
+.arow summary::before { content: "▸"; font-size: 11px; } .arow details[open] summary::before { content: "▾"; }
+.arow .sched { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.lstat { font-weight: 700; font-size: 12px; margin-left: auto; }
+.hide { display: none !important; }
+.pbox { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px 10px; align-items: end; }
+.pbox .pname-f { grid-column: 1 / -1; } .pbox .pname-f input { font-weight: 700; font-size: 15px; }
+.pbox .ptype-f, .pbox .papplies-f { grid-column: span 3; }
+.pbox .pmin-f, .pbox .pvalue-f, .pbox .pfrom-f, .pbox .puntil-f { grid-column: span 3; }
+.pbox .pfoot { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.pbox .phint { margin: 0; font-size: 13px; color: #5C4500; background: #FFF6DD; border-radius: 8px; padding: 6px 10px; grid-column: 1 / -1; }
+.oempty { text-align: center; color: var(--muted); padding: 34px 10px; border: 1px dashed var(--line); border-radius: 14px; background: var(--white); }
+.osave { background: var(--white); border-top: 1px solid var(--line); padding: 10px 20px calc(10px + env(safe-area-inset-bottom)); }
+.osave .in { max-width: 980px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+.osave .state { flex: 1; font-size: 13px; color: var(--muted); }
+.osave .state.dirty { color: #B45F06; font-weight: 700; }
+.osave .btn { width: auto; padding: 0 28px; margin: 0; }
+.osave .msgs { max-width: 980px; margin: 0 auto; }
+.osave .error, .osave .ok-msg { margin: 0 0 8px; }
+@media (max-width: 760px) { .ogrid { grid-template-columns: 1fr; } .ohead { padding: 12px 14px 0; } .obody { padding: 14px; } .osave { padding-left: 14px; padding-right: 14px; } .osave .state { display: none; } .osave .btn { flex: 1; } .pbox .ptype-f, .pbox .papplies-f { grid-column: 1 / -1; } }
 @media (max-width: 720px) { .hero { padding: 18px 16px; } .hero h2 { font-size: 24px; } .hero-art { display: none; } }
-@media (max-width: 720px) { .arow { grid-template-columns: 1fr 1fr; } .arow .name { grid-column: 1 / -1; } .ahead { display: none; } }
 
 @media (max-width: 600px) { .style-premium #list { grid-template-columns: repeat(2, 1fr); gap: 10px; } .style-premium .hero h2 { font-size: 26px; } .style-premium .hero { padding: 22px 16px; } }
 @media (max-width: 900px) {
@@ -352,30 +403,45 @@ body.style-premium.theme-navy   { --bg:#0E1626; --bg2:#080E1A; --sf:#152238; --c
 </div>
 
 <!-- OWNER POPUP: log in, then add / edit / hide products -->
-<div class="modal" id="ownerModal">
-  <div class="box admin-box">
-    <div id="ownerLogin">
-      <h3 style="margin-top:0;">Owner login</h3>
-      <p class="small" style="margin:0 0 8px;">Only the shop owner can change products here.</p>
-      <input id="oPass" type="password" placeholder="Owner password" autocomplete="current-password">
-      <div class="error" id="oLoginError" role="alert"></div>
-      <button class="btn primary" id="oLoginBtn">Log in</button>
-      <button class="btn close" id="oCloseLogin">Close</button>
+<div class="modal console" id="ownerModal">
+  <div class="box">
+    <div id="ownerLogin" style="display:flex;flex:1;">
+      <div class="lock">
+        <img src="logo.svg" alt="">
+        <h3>Shop manager</h3>
+        <p class="small" style="margin:0;">Owner only. Change products, photos and offers here.</p>
+        <input id="oPass" type="password" placeholder="Owner password" autocomplete="current-password">
+        <div class="error" id="oLoginError" role="alert"></div>
+        <button class="btn primary" id="oLoginBtn">Log in</button>
+        <button class="btn close" id="oCloseLogin">Back to the shop</button>
+      </div>
     </div>
-    <div id="ownerEdit" style="display:none;">
-      <h3 style="margin-top:0;">Your products</h3>
-      <p class="small" style="margin:0 0 10px;">Change anything below, then press <b>Save changes</b>. Tick <b>In stock</b> off to show an item as Sold out.</p>
-      <div class="arow ahead"><span>Product name</span><span>Pack size</span><span>Price</span><span>Category</span><span>Stock</span><span></span></div>
-      <div id="oRows"></div>
-      <button class="btn alt" id="oAdd">+ Add a product</button>
-      <h3>Offers and promotions</h3>
-      <p class="small" style="margin:0 0 8px;">Set discounts that apply by themselves at the order page. Customers see them, and the server works out the price, so nobody can change it. Only the best offer applies to each product. An order offer, such as spend and save, applies after that.</p>
-      <div id="pRows"></div>
-      <button class="btn alt" id="pAdd">+ Add an offer</button>
-      <div class="error" id="oError" role="alert"></div>
-      <div class="ok-msg" id="oOk" role="status"></div>
-      <button class="btn primary" id="oSave">Save changes</button>
-      <button class="btn close" id="oLogout">Log out &amp; close</button>
+    <div class="oshell" id="ownerEdit">
+      <div class="ohead">
+        <div class="top"><h3>Shop manager<small id="oBiz"></small></h3><button class="out" id="oLogout">Log out</button></div>
+        <div class="otabs" role="tablist">
+          <button class="on" id="tabP" role="tab">Products<span class="n" id="nP">0</span></button>
+          <button id="tabO" role="tab">Offers<span class="n" id="nO">0</span></button>
+        </div>
+      </div>
+      <div class="obody">
+        <div class="opane on" id="paneP">
+          <div class="otools"><input type="search" id="oSearch" placeholder="Search your products"><button class="addbtn" id="oAdd">+ Add product</button></div>
+          <div class="ochips" id="oChips" style="margin-bottom:14px;"></div>
+          <div class="ogrid" id="oRows"></div>
+          <div class="oempty hide" id="oNone">No product matches your search.</div>
+        </div>
+        <div class="opane" id="paneO">
+          <p class="small" style="margin:0 0 12px;max-width:640px;">Offers apply by themselves on the order page. Customers see them and the server works out the price, so nobody can change it. Each product gets its best single offer, then the best spend offer applies to the whole order.</p>
+          <div class="otools"><button class="addbtn" id="pAdd">+ Add offer</button></div>
+          <div id="pRows"></div>
+          <div class="oempty" id="pNone">No offers yet. Press <b>Add offer</b> to create your first one.</div>
+        </div>
+      </div>
+      <div class="osave">
+        <div class="msgs"><div class="error" id="oError" role="alert"></div><div class="ok-msg" id="oOk" role="status"></div></div>
+        <div class="in"><span class="state" id="oState">All changes saved</span><button class="btn primary" id="oSave">Save changes</button></div>
+      </div>
     </div>
     <datalist id="catList"></datalist>
   </div>
@@ -1034,6 +1100,13 @@ function resizeToJpeg(file) {
   });
 }
 
+function fld(label, el, cls) {
+  const l = document.createElement("label");
+  l.className = "f " + (cls || "");
+  const t = document.createElement("span"); t.textContent = label;
+  l.append(t, el);
+  return l;
+}
 function ownerRow(p) {
   const r = document.createElement("div");
   r.className = "arow";
@@ -1044,59 +1117,84 @@ function ownerRow(p) {
     if (type === "number") { i.step = "0.01"; i.min = "0"; i.inputMode = "decimal"; }
     return i;
   };
-  const name = mk("name", "Product name", p.name);
+  const name = mk("name", "e.g. Butter croissant", p.name);
   const pack = mk("pack", "e.g. 12 pcs", p.pack);
   const price = mk("price", "0.00", p.price === "" ? "" : Number(p.price).toFixed(2), "number");
-  const cat = mk("cat", "Category", p.cat); cat.setAttribute("list", "catList");
-  const lab = document.createElement("label");
+  const cat = mk("cat", "e.g. Bread", p.cat); cat.setAttribute("list", "catList");
+  const img = mk("img", "Photo address (optional)", p.img || "");
+
+  // stock switch
+  const sw = document.createElement("label"); sw.className = "sw";
   const chk = document.createElement("input"); chk.type = "checkbox"; chk.className = "avail"; chk.checked = p.available !== false;
-  lab.append(chk, "In stock");
+  const knob = document.createElement("i"); const swt = document.createElement("span");
+  sw.append(chk, knob, swt);
+  const showStock = () => { swt.textContent = chk.checked ? "In stock" : "Sold out"; r.classList.toggle("off", !chk.checked); };
+  chk.addEventListener("change", showStock); showStock();
+
   const del = document.createElement("button");
-  del.type = "button"; del.className = "del"; del.textContent = "×"; del.title = "Remove this product";
-  del.onclick = () => r.remove();
-  const img = mk("img", "Photo (optional): press Upload photo, or paste an address", p.img || "");
-  const line = document.createElement("div");
-  line.className = "imgline";
-  const thumb = document.createElement("img");
-  thumb.className = "thumb"; thumb.alt = "";
-  const showThumb = () => { if (goodImage(img.value.trim())) { thumb.src = img.value.trim(); thumb.style.display = ""; } else thumb.style.display = "none"; };
-  thumb.onerror = () => { thumb.style.display = "none"; };
+  del.type = "button"; del.className = "del"; del.textContent = "Remove"; del.title = "Remove this product";
+  del.onclick = () => { r.remove(); ownerTouched(); };
+
+  // photo: tap the picture to upload (phone camera, gallery, Drive, computer)
+  const pic = document.createElement("button");
+  pic.type = "button"; pic.className = "pic"; pic.title = "Tap to add or change the photo";
+  const thumb = document.createElement("img"); thumb.className = "thumb"; thumb.alt = "";
+  const ph = document.createElement("span"); ph.className = "ph"; ph.innerHTML = "<b>+</b>Add photo";
+  const cam = document.createElement("span"); cam.className = "cam"; cam.textContent = "Change";
+  pic.append(ph, thumb, cam);
+  const showThumb = () => {
+    const ok = goodImage(img.value.trim());
+    if (ok) thumb.src = img.value.trim();
+    thumb.style.display = ok ? "" : "none"; cam.style.display = ok ? "" : "none"; ph.style.display = ok ? "none" : "";
+  };
+  thumb.onerror = () => { thumb.style.display = "none"; cam.style.display = "none"; ph.style.display = ""; };
   img.addEventListener("change", showThumb); showThumb();
   const file = document.createElement("input");
   file.type = "file"; file.accept = "image/*"; file.style.display = "none";
-  const up = document.createElement("button");
-  up.type = "button"; up.className = "upl"; up.textContent = "📷 Upload photo";
-  up.onclick = () => file.click();
+  const up = pic;   // kept so the upload status can show on the picture
+  pic.onclick = () => file.click();
   file.onchange = async () => {
     if (!file.files || !file.files[0]) return;
-    up.disabled = true; up.textContent = "Uploading…";
+    pic.disabled = true; cam.style.display = ""; cam.textContent = "Uploading…";
     try {
       const data = await resizeToJpeg(file.files[0]);
       const res = await ownerCall({ action: "admin_upload", password: ownerPassword, data: data });
-      if (res && res.ok) { img.value = res.url; showThumb(); up.textContent = "✓ Uploaded"; }
-      else { up.textContent = "📷 Upload photo"; ownerMsg($("oError"), (res && res.error) || "Could not upload the photo."); }
-    } catch (e) { up.textContent = "📷 Upload photo"; ownerMsg($("oError"), "Could not upload the photo. Please try another one."); }
-    up.disabled = false; file.value = "";
+      if (res && res.ok) { img.value = res.url; showThumb(); cam.textContent = "Change"; ownerTouched(); }
+      else { cam.textContent = "Change"; showThumb(); ownerMsg($("oError"), (res && res.error) || "Could not upload the photo."); }
+    } catch (e) { cam.textContent = "Change"; showThumb(); ownerMsg($("oError"), "Could not upload the photo. Please try another one."); }
+    pic.disabled = false; file.value = "";
   };
-  line.append(thumb, img, up, file);
 
   // Listing dates: the product shows to customers only between these days (leave empty for no limit).
   const sch = document.createElement("div");
   sch.className = "sched";
   const mkDate = (cls, val) => { const i = document.createElement("input"); i.type = "date"; i.className = cls; i.value = val || ""; return i; };
   const fromI = mkDate("from", p.from), untilI = mkDate("until", p.until);
-  const stat = document.createElement("span");
-  stat.className = "lstat";
+  sch.append(fld("Show to customers from", fromI), fld("Hide again after", untilI));
+  const det = document.createElement("details");
+  const sum = document.createElement("summary");
+  const sl = document.createElement("span"); sl.textContent = "Schedule";
+  const stat = document.createElement("span"); stat.className = "lstat";
+  sum.append(sl, stat);
+  det.append(sum, sch);
   const upd = () => {
     const t = ownerToday, f = fromI.value, u = untilI.value;
     if (f && f > t) stat.textContent = "Not listed yet: starts " + plainDate(f);
     else if (u && u < t) stat.textContent = "Unlisted: ended " + plainDate(u);
     else stat.textContent = u ? "Listed now, until " + plainDate(u) : "Listed now";
-    stat.style.color = (f && f > t) || (u && u < t) ? "var(--red)" : "var(--green)";
+    const hidden = (f && f > t) || (u && u < t);
+    stat.style.color = hidden ? "var(--red)" : "var(--green)";
+    r.dataset.hidden = hidden ? "1" : "";
   };
   fromI.addEventListener("change", upd); untilI.addEventListener("change", upd); upd();
-  sch.append("Show to customers from", fromI, "until", untilI, stat);
-  r.append(name, pack, price, cat, lab, del, line, sch);
+  if (p.from || p.until) det.open = true;
+
+  const mid = document.createElement("div"); mid.className = "mid";
+  mid.append(fld("Pack size", pack), fld("Price (" + CURRENCY + ")", price), fld("Category", cat, "w-cat"), fld("Photo address", img, "w-img"));
+  const foot = document.createElement("div"); foot.className = "foot2";
+  foot.append(sw, del);
+  r.append(pic, fld("Product name", name, "w-nm"), mid, det, foot, file);
+  r.addEventListener("input", ownerTouched); r.addEventListener("change", ownerTouched);
   return r;
 }
 
@@ -1114,7 +1212,40 @@ function ownerFill(data) {
   const pr = $("pRows");
   pr.innerHTML = "";
   (Array.isArray(data.promos) ? data.promos : []).forEach(q => pr.appendChild(promoRow(q)));
+  $("oBiz").textContent = BUSINESS_NAME;
+  $("oSearch").value = "";
+  ownerSaved(); ownerStats();
 }
+
+/* ----- console helpers: tabs, search, counts, unsaved marker ----- */
+function ownerTab(which) {
+  $("tabP").classList.toggle("on", which === "P"); $("tabO").classList.toggle("on", which === "O");
+  $("paneP").classList.toggle("on", which === "P"); $("paneO").classList.toggle("on", which === "O");
+}
+function ownerStats() {
+  const rows = [...$("oRows").children];
+  const off = rows.filter(r => !r.querySelector(".avail").checked).length;
+  const sched = rows.filter(r => r.dataset.hidden).length;
+  const live = rows.length - off - sched;
+  $("nP").textContent = rows.length; $("nO").textContent = $("pRows").children.length;
+  $("oChips").innerHTML = "";
+  [["g", live + " on sale"], ["r", off + " sold out"], ["y", sched + " scheduled or unlisted"]].forEach(c => {
+    if (c[0] === "g" || !c[1].startsWith("0")) { const e = document.createElement("span"); e.className = "ochip " + c[0]; e.textContent = c[1]; $("oChips").appendChild(e); }
+  });
+  $("pNone").classList.toggle("hide", $("pRows").children.length > 0);
+  ownerFilter();
+}
+function ownerFilter() {
+  const q = $("oSearch").value.trim().toLowerCase();
+  let shown = 0;
+  [...$("oRows").children].forEach(r => {
+    const t = (r.querySelector(".name").value + " " + r.querySelector(".cat").value + " " + (r.dataset.code || "")).toLowerCase();
+    const ok = !q || t.includes(q); r.classList.toggle("hide", !ok); if (ok) shown++;
+  });
+  $("oNone").classList.toggle("hide", shown > 0 || !$("oRows").children.length);
+}
+function ownerTouched() { $("oState").textContent = "You have unsaved changes"; $("oState").classList.add("dirty"); $("oOk").classList.remove("show"); ownerStats(); }
+function ownerSaved() { $("oState").textContent = "All changes saved"; $("oState").classList.remove("dirty"); }
 
 /* ----- offers editor ----- */
 const PROMO_LABELS = { percent: "Percent off a product", buyget: "Buy some, get some free", spend: "Spend and save (RM)", spendpct: "Spend and save (%)" };
@@ -1128,10 +1259,8 @@ function appliesChoices() {
 function promoRow(q) {
   const box = document.createElement("div");
   box.className = "pbox";
-  const r1 = document.createElement("div"); r1.className = "prow";
-  const r2 = document.createElement("div"); r2.className = "prow2";
   const inp = (cls, ph, val, type) => { const i = document.createElement("input"); i.className = cls; i.placeholder = ph; i.type = type || "text"; i.value = val == null ? "" : val; if (type === "number") { i.step = "any"; i.min = "0"; i.inputMode = "decimal"; } return i; };
-  const name = inp("pname", "Offer name, e.g. Weekend special", q.name);
+  const name = inp("pname", "e.g. Weekend special", q.name);
   const type = document.createElement("select"); type.className = "ptype";
   Object.keys(PROMO_LABELS).forEach(k => { const o = document.createElement("option"); o.value = k; o.textContent = PROMO_LABELS[k]; type.appendChild(o); });
   type.value = PROMO_LABELS[q.type] ? q.type : "percent";
@@ -1149,26 +1278,30 @@ function promoRow(q) {
   const min = inp("pmin", "", q.min, "number");
   const value = inp("pvalue", "", q.value, "number");
   const from = inp("pfrom", "", q.from, "date"), until = inp("puntil", "", q.until, "date");
-  from.title = "Starts on (empty = now)"; until.title = "Ends on (empty = no end)";
-  const lab = document.createElement("label");
+  const sw = document.createElement("label"); sw.className = "sw";
   const act = document.createElement("input"); act.type = "checkbox"; act.className = "pactive"; act.checked = q.active !== false;
-  lab.append(act, "On");
-  const del = document.createElement("button"); del.type = "button"; del.className = "del"; del.textContent = "×"; del.title = "Remove this offer";
-  del.onclick = () => box.remove();
+  const knob = document.createElement("i"), swt = document.createElement("span");
+  sw.append(act, knob, swt);
+  const showOn = () => { swt.textContent = act.checked ? "Offer is on" : "Offer is off"; box.style.opacity = act.checked ? "" : ".65"; };
+  act.addEventListener("change", showOn); showOn();
+  const del = document.createElement("button"); del.type = "button"; del.className = "del"; del.textContent = "Remove"; del.title = "Remove this offer";
+  del.onclick = () => { box.remove(); ownerTouched(); };
   const hint = document.createElement("p"); hint.className = "phint";
+  const fMin = fld("", min, "pmin-f"), fVal = fld("", value, "pvalue-f"), fApp = fld("Applies to", applies, "papplies-f");
   const refresh = () => {
     const t = type.value;
-    const pl = { percent: ["Min qty per item (optional)", "% off"], buyget: ["Buy this many", "Get this many free"], spend: ["Min order (RM)", "RM off"], spendpct: ["Min order (RM)", "% off"] }[t];
-    min.placeholder = pl[0]; value.placeholder = pl[1]; min.title = pl[0]; value.title = pl[1];
-    applies.style.display = (t === "spend" || t === "spendpct") ? "none" : "";
+    const pl = { percent: ["Minimum quantity (optional)", "Percent off"], buyget: ["Customer buys", "Gets free"], spend: ["Minimum order (" + CURRENCY + ")", CURRENCY + " off"], spendpct: ["Minimum order (" + CURRENCY + ")", "Percent off"] }[t];
+    min.placeholder = pl[0]; value.placeholder = pl[1];
+    fMin.firstChild.textContent = pl[0]; fVal.firstChild.textContent = pl[1];
+    fApp.style.display = (t === "spend" || t === "spendpct") ? "none" : "";
     const d = { name: name.value, type: t, applies: applies.value, min: Number(min.value) || 0, value: Number(value.value) || 0, until: until.value };
     hint.textContent = d.value > 0 ? "Customers see: " + describePromo(d, true) + (from.value ? " (from " + plainDate(from.value) + ")" : "") : "Fill in the amount to see how this offer reads.";
   };
   [name, type, applies, min, value, from, until].forEach(e => { e.addEventListener("input", refresh); e.addEventListener("change", refresh); });
   refresh();
-  r1.append(name, type, applies);
-  r2.append(min, value, from, until, lab, del);
-  box.append(r1, r2, hint);
+  const foot = document.createElement("div"); foot.className = "pfoot"; foot.append(sw, del);
+  box.append(fld("Offer name", name, "pname-f"), fld("Type", type, "ptype-f"), fApp, fMin, fVal, fld("Starts on (empty = now)", from, "pfrom-f"), fld("Ends on (empty = no end)", until, "puntil-f"), hint, foot);
+  box.addEventListener("input", ownerTouched); box.addEventListener("change", ownerTouched);
   return box;
 }
 function promoCollect() {
@@ -1221,7 +1354,7 @@ async function ownerLogin() {
     if (data && data.ok) {
       ownerPassword = pw; $("oPass").value = "";
       ownerFill(data);
-      $("ownerLogin").style.display = "none"; $("ownerEdit").style.display = "";
+      $("ownerLogin").style.display = "none"; $("ownerEdit").classList.add("on"); ownerTab("P");
     } else ownerMsg($("oLoginError"), (data && data.error) || "Could not log in.");
   } catch (e) { ownerMsg($("oLoginError"), "Could not connect. Please try again."); }
   btn.disabled = false; btn.textContent = "Log in";
@@ -1252,7 +1385,8 @@ async function ownerSave() {
     const data = await ownerCall({ action: "admin_save", password: ownerPassword, products: list, promos: promos });
     if (data && data.ok) {
       await loadProducts();                         // the customer view = what the server lists today
-      ownerMsg($("oOk"), "Saved. Customers will see the new list and offers now.");
+      ownerSaved(); ownerStats();
+      ownerMsg($("oOk"), "Saved. Customers see the new products and offers now.");
     } else ownerMsg($("oError"), (data && data.error) || "Could not save. Please try again.");
   } catch (e) { ownerMsg($("oError"), "Could not connect. Please try again."); }
   btn.disabled = false; btn.textContent = "Save changes";
@@ -1261,7 +1395,7 @@ async function ownerSave() {
 function ownerClose() {
   ownerPassword = "";
   $("ownerModal").classList.remove("open");
-  $("ownerLogin").style.display = ""; $("ownerEdit").style.display = "none";
+  $("ownerLogin").style.display = "flex"; $("ownerEdit").classList.remove("on");
 }
 
 /* ---------- events ---------- */
@@ -1270,9 +1404,11 @@ $("openOwner").onclick = () => { $("oLoginError").classList.remove("show"); $("o
 $("oLoginBtn").onclick = ownerLogin;
 $("oPass").addEventListener("keydown", e => { if (e.key === "Enter") ownerLogin(); });
 $("oCloseLogin").onclick = $("oLogout").onclick = ownerClose;
-$("oAdd").onclick = () => { const r = ownerRow({ code: "", name: "", pack: "", price: "", cat: "", available: true, img: "" }); $("oRows").appendChild(r); r.querySelector(".name").focus(); };
+$("oAdd").onclick = () => { ownerTab("P"); $("oSearch").value = ""; const r = ownerRow({ code: "", name: "", pack: "", price: "", cat: "", available: true, img: "" }); $("oRows").appendChild(r); ownerStats(); ownerTouched(); if (r.scrollIntoView) r.scrollIntoView({ block: "center" }); r.querySelector(".name").focus(); };
+$("tabP").onclick = () => ownerTab("P"); $("tabO").onclick = () => ownerTab("O");
+$("oSearch").addEventListener("input", ownerFilter);
 $("oSave").onclick = ownerSave;
-$("pAdd").onclick = () => { const b = promoRow({ name: "", type: "percent", applies: "ALL", min: "", value: "", from: "", until: "", active: true }); $("pRows").appendChild(b); b.querySelector(".pname").focus(); };
+$("pAdd").onclick = () => { const b = promoRow({ name: "", type: "percent", applies: "ALL", min: "", value: "", from: "", until: "", active: true }); $("pRows").appendChild(b); ownerTab("O"); ownerTouched(); b.querySelector(".pname").focus(); };
 $("review").onclick = $("mReview").onclick = openModal;
 $("submitBtn").onclick = submitOrder;
 $("closeModal").onclick = () => $("modal").classList.remove("open");
