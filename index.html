@@ -188,6 +188,27 @@ body.style-premium.theme-navy   { --bg:#0E1626; --bg2:#080E1A; --sf:#152238; --c
 .product.has { border-color: var(--gold); }
 @media (max-width: 720px) { .style-fast .stepper .quick { display: none; } .style-fast .p-meta { display: none; } }
 
+.tag { display: inline-block; background: #FFF1C9; color: #7A5B00; border-radius: 999px; padding: 2px 9px; font-size: 11px; font-weight: 700; margin: 5px 5px 0 0; }
+.offers { display: none; background: #FFF6DD; border: 1px solid #F0DDA0; color: #5C4500; border-radius: 12px; padding: 10px 12px; margin: 0 0 12px; font-size: 13px; }
+.offers.show { display: block; }
+.offers b { display: block; margin-bottom: 4px; }
+.offers div { margin: 2px 0; }
+.line.disc span { color: var(--green); font-weight: 700; }
+.line.disc { font-size: 12px; padding-left: 10px; }
+.arow .sched { grid-column: 1 / -1; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.arow .sched input { width: 140px; flex: none; height: 34px; }
+.arow .lstat { font-weight: 700; margin-left: auto; }
+.prow { display: grid; grid-template-columns: 1.4fr 1.1fr 1.4fr; gap: 6px; align-items: center; margin-bottom: 4px; }
+.prow2 { display: grid; grid-template-columns: .7fr .7fr 1fr 1fr auto auto; gap: 6px; align-items: center; margin-bottom: 4px; }
+.prow input, .prow select, .prow2 input { height: 36px; margin: 0; font-size: 13px; padding: 0 8px; width: 100%; border: 1px solid var(--line); border-radius: 8px; background: var(--white); color: inherit; font-family: inherit; }
+.prow2 label { font-size: 12px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.prow2 input[type=checkbox] { width: 16px; height: 16px; }
+.phint { font-size: 12px; color: var(--muted); margin: 2px 0 0; }
+.pbox { border-bottom: 1px dashed var(--line); padding-bottom: 8px; margin-bottom: 8px; }
+.pbox .del { border: 0; background: transparent; color: var(--red); font-size: 20px; cursor: pointer; padding: 0 6px; }
+@media (max-width: 720px) { .prow { grid-template-columns: 1fr; } .prow2 { grid-template-columns: 1fr 1fr; } }
+.style-premium .tag { background: var(--c1); color: var(--lk); border: 1px solid var(--ln2); }
+.style-premium .offers { background: var(--c1); border-color: var(--ln2); color: var(--tx); }
 .foot { text-align: center; padding: 0 0 90px; }
 .foot .linkbtn { color: var(--muted); font-size: 12px; }
 .soldout { font-size: 13px; font-weight: 700; color: var(--red); }
@@ -242,6 +263,7 @@ body.style-premium.theme-navy   { --bg:#0E1626; --bg2:#080E1A; --sf:#152238; --c
   <main>
     <h1 id="title">All products</h1>
     <div class="note">Prices are indicative. The seller confirms your order and the final price after you submit.</div>
+    <div class="offers" id="offerBanner"></div>
     <button class="repeat" id="repeatBtn" type="button"></button>
     <div id="list"></div>
   </main>
@@ -346,6 +368,10 @@ body.style-premium.theme-navy   { --bg:#0E1626; --bg2:#080E1A; --sf:#152238; --c
       <div class="arow ahead"><span>Product name</span><span>Pack size</span><span>Price</span><span>Category</span><span>Stock</span><span></span></div>
       <div id="oRows"></div>
       <button class="btn alt" id="oAdd">+ Add a product</button>
+      <h3>Offers and promotions</h3>
+      <p class="small" style="margin:0 0 8px;">Set discounts that apply by themselves at the order page. Customers see them, and the server works out the price, so nobody can change it. Only the best offer applies to each product. An order offer, such as spend and save, applies after that.</p>
+      <div id="pRows"></div>
+      <button class="btn alt" id="pAdd">+ Add an offer</button>
       <div class="error" id="oError" role="alert"></div>
       <div class="ok-msg" id="oOk" role="status"></div>
       <button class="btn primary" id="oSave">Save changes</button>
@@ -482,6 +508,11 @@ function renderList() {
     row.querySelector(".p-name").textContent = p.name;
     row.querySelector(".p-meta").textContent = p.code + " · " + p.pack;
     row.querySelector(".p-price").textContent = money(p.price);
+    PROMOS.filter(x => (x.type === "percent" || x.type === "buyget") && promoMatches(x.applies, p)).forEach(x => {
+      const tg = document.createElement("span");
+      tg.className = "tag"; tg.title = x.name; tg.textContent = "🏷 " + describePromo(x, false);
+      row.querySelector(".p-price").appendChild(tg);
+    });
     const qty = row.querySelector(".qty");
     qty.value = cart.get(p.code) || 0;
     row.classList.toggle("has", (cart.get(p.code) || 0) > 0);
@@ -523,8 +554,8 @@ function addLine(container, left, right) {
 
 function renderOrder() {
   renderRepeat();
-  const rows = orderRows();
-  const total = rows.reduce((s, r) => s + r.sub, 0);
+  const { rows, q } = quote();
+  const total = q.total;
   const items = rows.reduce((s, r) => s + r.qty, 0);
   const label = items + (items === 1 ? " item" : " items");
   $("count").textContent = label; $("mCount").textContent = label;
@@ -533,7 +564,93 @@ function renderOrder() {
   const lines = $("lines");
   lines.innerHTML = "";
   if (!rows.length) { lines.innerHTML = '<div class="empty">Your order is empty.</div>'; return; }
-  rows.forEach(r => addLine(lines, r.qty + " × " + r.p.name, money(r.sub)));
+  addQuoteLines(lines, rows, q);
+}
+
+/* Product lines, then each offer that applied, as green "minus" lines. */
+function addQuoteLines(box, rows, q, withPack) {
+  rows.forEach((r, i) => {
+    addLine(box, r.qty + " × " + r.p.name + (withPack ? " (" + r.p.pack + ")" : ""), money(r.sub));
+    if (q.lines[i].discount > 0) {
+      addLine(box, "🏷 " + q.lines[i].offer, "-" + money(q.lines[i].discount));
+      box.lastChild.classList.add("disc");
+    }
+  });
+  if (q.orderDiscount > 0) {
+    addLine(box, "🏷 " + q.orderOffer, "-" + money(q.orderDiscount));
+    box.lastChild.classList.add("disc");
+  }
+}
+
+/* ---------- offers (same rules as the server) ---------- */
+let PROMOS = [];
+function promoMatches(applies, line) {
+  const a = String(applies || "");
+  if (a === "ALL") return true;
+  if (a.indexOf("CAT:") === 0) return String(line.cat || "").toLowerCase() === a.slice(4).toLowerCase();
+  if (a.indexOf("CODE:") === 0) return String(line.code || "").toUpperCase() === a.slice(5).toUpperCase();
+  return false;
+}
+function priceOrder(lines, promos) {
+  const r2 = n => Math.round(n * 100) / 100;
+  const out = [], applied = [];
+  let subtotal = 0, lineDiscount = 0;
+  lines.forEach(l => {
+    const gross = r2(l.price * l.qty);
+    let best = 0, bestName = "";
+    promos.forEach(p => {
+      if (p.type === "spend" || p.type === "spendpct" || !promoMatches(p.applies, l)) return;
+      let save = 0;
+      if (p.type === "percent" && l.qty >= Math.max(1, p.min)) save = gross * p.value / 100;
+      if (p.type === "buyget" && p.min >= 1 && p.value >= 1) save = Math.floor(l.qty / (p.min + p.value)) * p.value * l.price;
+      save = Math.min(gross, r2(save));
+      if (save > best) { best = save; bestName = p.name; }
+    });
+    out.push({ gross, discount: best, offer: bestName });
+    if (best > 0) applied.push(l.name + ": " + bestName + " (-RM " + best.toFixed(2) + ")");
+    subtotal += gross - best;
+    lineDiscount += best;
+  });
+  subtotal = r2(subtotal);
+  let orderBest = 0, orderName = "";
+  promos.forEach(p => {
+    if ((p.type !== "spend" && p.type !== "spendpct") || subtotal < p.min) return;
+    let save = p.type === "spend" ? p.value : subtotal * p.value / 100;
+    save = Math.min(subtotal, r2(save));
+    if (save > orderBest) { orderBest = save; orderName = p.name; }
+  });
+  if (orderBest > 0) applied.push(orderName + " (-RM " + orderBest.toFixed(2) + ")");
+  return { lines: out, subtotal, lineDiscount: r2(lineDiscount), orderDiscount: orderBest, total: r2(subtotal - orderBest), orderOffer: orderName, applied };
+}
+function quote() {
+  const rows = orderRows();
+  const q = priceOrder(rows.map(r => ({ code: r.p.code, name: r.p.name, cat: r.p.cat, price: r.p.price, qty: r.qty })), PROMOS);
+  return { rows, q };
+}
+const plainDate = d => { try { return new Date(d + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short" }); } catch (e) { return d; } };
+function describePromo(p, withTarget) {
+  const m = n => money(n);
+  let t = "";
+  if (p.type === "percent") t = p.value + "% off" + (p.min > 1 ? " when you order " + p.min + " or more" : "");
+  if (p.type === "buyget") t = "Buy " + p.min + ", get " + p.value + " free";
+  if (p.type === "spend") t = "Spend " + m(p.min) + " or more, save " + m(p.value);
+  if (p.type === "spendpct") t = "Spend " + m(p.min) + " or more, save " + p.value + "%";
+  if (withTarget && (p.type === "percent" || p.type === "buyget")) {
+    const a = String(p.applies || "ALL");
+    if (a === "ALL") t += " on all products";
+    else if (a.indexOf("CAT:") === 0) t += " on " + a.slice(4);
+    else { const pr = PRODUCTS.find(x => x.code.toUpperCase() === a.slice(5).toUpperCase()); t += " on " + (pr ? pr.name : a.slice(5)); }
+  }
+  if (p.until) t += " (until " + plainDate(p.until) + ")";
+  return t;
+}
+function renderOffers() {
+  const box = $("offerBanner");
+  box.innerHTML = "";
+  if (!PROMOS.length) { box.classList.remove("show"); return; }
+  const h = document.createElement("b"); h.textContent = "Current offers"; box.appendChild(h);
+  PROMOS.forEach(p => { const d = document.createElement("div"); d.textContent = "🏷 " + p.name + ": " + describePromo(p, true); box.appendChild(d); });
+  box.classList.add("show");
 }
 
 /* ---------- repeat last order ---------- */
@@ -616,12 +733,11 @@ function showForm() {
 }
 
 function openModal() {
-  const rows = orderRows();
-  const total = rows.reduce((s, r) => s + r.sub, 0);
+  const { rows, q } = quote();
   const box = $("summary");
   box.innerHTML = "";
-  rows.forEach(r => addLine(box, r.qty + " × " + r.p.name + " (" + r.p.pack + ")", money(r.sub)));
-  $("sTotal").textContent = money(total);
+  addQuoteLines(box, rows, q, true);
+  $("sTotal").textContent = money(q.total);
   $("cDate").min = todayISO();
   showForm();
   $("modal").classList.add("open");
@@ -659,8 +775,7 @@ function buildPayload() {
 }
 
 function orderText() {
-  const rows = orderRows();
-  const total = rows.reduce((s, r) => s + r.sub, 0);
+  const { rows, q } = quote();
   return [
     "NEW ORDER " + currentRef + " - " + BUSINESS_NAME,
     "Customer: " + ($("cName").value || "-"),
@@ -669,8 +784,9 @@ function orderText() {
     "Delivery date: " + ($("cDate").value || "-"),
     "",
     ...rows.map(r => r.qty + " x " + r.p.code + " " + r.p.name + " (" + r.p.pack + ") - " + money(r.sub)),
+    ...(q.applied.length ? ["", "Offers: " + q.applied.join("; ")] : []),
     "",
-    "Total (indicative): " + money(total)
+    "Total (indicative): " + money(q.total)
   ].join("\n");
 }
 
@@ -698,7 +814,11 @@ async function submitOrder() {
   }
 
   btn.disabled = false; btn.textContent = "Submit order";
-  if (!result || !result.ok) { formError((result && result.error) || "Something went wrong. Please try again."); return; }
+  if (!result || !result.ok) {
+    formError((result && result.error) || "Something went wrong. Please try again.");
+    if (result && /no longer available/.test(result.error || "")) { loadProducts().then(() => { renderOrder(); }); }
+    return;
+  }
   showDone(result);
 }
 
@@ -790,6 +910,7 @@ function renderTrack(r, target) {
   out.appendChild(row("Order number", r.ref));
   if (r.deliveryDate) out.appendChild(row("Delivery date", r.deliveryDate));
   if (r.items) out.appendChild(row("Items", r.items));
+  if (r.offers) out.appendChild(row("Offers applied", r.offers));
   if (r.total != null) out.appendChild(row("Total (indicative)", money(r.total)));
   if (r.updated) out.appendChild(row("Last update", r.updated));
 }
@@ -849,32 +970,38 @@ async function findOrders() {
 }
 
 /* ---------- product list from the sheet ---------- */
-function applyProducts(list) {
-  if (!Array.isArray(list) || !list.length) return false;
+function applyProducts(list, promos, custom) {
+  if (!Array.isArray(list) || (!list.length && !custom)) return false;
   PRODUCTS = list.map(p => ({
     code: String(p.code), name: String(p.name), pack: String(p.pack || ""),
     price: Number(p.price) || 0, cat: String(p.cat || "Other"), available: p.available !== false,
     img: goodImage(p.img) ? p.img : ""
   }));
-  for (const code of [...cart.keys()]) {          // drop anything removed or sold out meanwhile
+  PROMOS = (Array.isArray(promos) ? promos : []).map(x => ({
+    name: String(x.name), type: String(x.type), applies: String(x.applies || "ALL"),
+    min: Number(x.min) || 0, value: Number(x.value) || 0, until: x.until ? String(x.until) : ""
+  }));
+  for (const code of [...cart.keys()]) {          // drop anything removed, unlisted or sold out meanwhile
     const p = PRODUCTS.find(x => x.code === code);
     if (!p || !p.available) cart.delete(code);
   }
   return true;
 }
 
+function refreshShop() { renderOffers(); renderCats(); renderList(); renderOrder(); }
+
 async function loadProducts() {
   try {                                           // show the last list instantly, then refresh it
     const cached = JSON.parse(localStorage.getItem("products") || "null");
-    if (applyProducts(cached)) { renderCats(); renderList(); renderOrder(); }
+    if (cached && !Array.isArray(cached) && applyProducts(cached.products, cached.promos, cached.custom)) refreshShop();
   } catch (e) {}
   if (!SHEET_URL) return;
   try {
     const res = await fetch(SHEET_URL + "?action=products");
     const data = await res.json();
-    if (data && data.ok && applyProducts(data.products)) {
-      try { localStorage.setItem("products", JSON.stringify(data.products)); } catch (e) {}
-      renderCats(); renderList(); renderOrder();
+    if (data && data.ok && applyProducts(data.products, data.promos, data.custom)) {
+      try { localStorage.setItem("products", JSON.stringify({ custom: true, products: data.products, promos: data.promos || [] })); } catch (e) {}
+      refreshShop();
     }
   } catch (e) {}                                  // offline: keep what is on screen
 }
@@ -952,16 +1079,109 @@ function ownerRow(p) {
     up.disabled = false; file.value = "";
   };
   line.append(thumb, img, up, file);
-  r.append(name, pack, price, cat, lab, del, line);
+
+  // Listing dates: the product shows to customers only between these days (leave empty for no limit).
+  const sch = document.createElement("div");
+  sch.className = "sched";
+  const mkDate = (cls, val) => { const i = document.createElement("input"); i.type = "date"; i.className = cls; i.value = val || ""; return i; };
+  const fromI = mkDate("from", p.from), untilI = mkDate("until", p.until);
+  const stat = document.createElement("span");
+  stat.className = "lstat";
+  const upd = () => {
+    const t = ownerToday, f = fromI.value, u = untilI.value;
+    if (f && f > t) stat.textContent = "Not listed yet: starts " + plainDate(f);
+    else if (u && u < t) stat.textContent = "Unlisted: ended " + plainDate(u);
+    else stat.textContent = u ? "Listed now, until " + plainDate(u) : "Listed now";
+    stat.style.color = (f && f > t) || (u && u < t) ? "var(--red)" : "var(--green)";
+  };
+  fromI.addEventListener("change", upd); untilI.addEventListener("change", upd); upd();
+  sch.append("Show to customers from", fromI, "until", untilI, stat);
+  r.append(name, pack, price, cat, lab, del, line, sch);
   return r;
 }
 
-function ownerFill() {
+let ownerToday = todayISO();
+
+function ownerFill(data) {
+  data = data || {};
+  if (data.today) ownerToday = data.today;
+  const list = Array.isArray(data.products) && data.products.length ? data.products : PRODUCTS;   // the owner sees every product, even unlisted ones
   const rows = $("oRows");
   rows.innerHTML = "";
-  PRODUCTS.forEach(p => rows.appendChild(ownerRow(p)));
+  list.forEach(p => rows.appendChild(ownerRow(p)));
   $("catList").innerHTML = "";
-  [...new Set(PRODUCTS.map(p => p.cat))].forEach(c => { const o = document.createElement("option"); o.value = c; $("catList").appendChild(o); });
+  [...new Set(list.map(p => p.cat))].forEach(c => { const o = document.createElement("option"); o.value = c; $("catList").appendChild(o); });
+  const pr = $("pRows");
+  pr.innerHTML = "";
+  (Array.isArray(data.promos) ? data.promos : []).forEach(q => pr.appendChild(promoRow(q)));
+}
+
+/* ----- offers editor ----- */
+const PROMO_LABELS = { percent: "Percent off a product", buyget: "Buy some, get some free", spend: "Spend and save (RM)", spendpct: "Spend and save (%)" };
+function appliesChoices() {
+  const prods = ownerCollect();
+  const out = [["ALL", "All products"]];
+  [...new Set(prods.map(p => p.cat))].forEach(c => out.push(["CAT:" + c, "Category: " + c]));
+  prods.forEach(p => out.push(["CODE:" + p.code, "Product: " + (p.name || p.code)]));
+  return out;
+}
+function promoRow(q) {
+  const box = document.createElement("div");
+  box.className = "pbox";
+  const r1 = document.createElement("div"); r1.className = "prow";
+  const r2 = document.createElement("div"); r2.className = "prow2";
+  const inp = (cls, ph, val, type) => { const i = document.createElement("input"); i.className = cls; i.placeholder = ph; i.type = type || "text"; i.value = val == null ? "" : val; if (type === "number") { i.step = "any"; i.min = "0"; i.inputMode = "decimal"; } return i; };
+  const name = inp("pname", "Offer name, e.g. Weekend special", q.name);
+  const type = document.createElement("select"); type.className = "ptype";
+  Object.keys(PROMO_LABELS).forEach(k => { const o = document.createElement("option"); o.value = k; o.textContent = PROMO_LABELS[k]; type.appendChild(o); });
+  type.value = PROMO_LABELS[q.type] ? q.type : "percent";
+  const applies = document.createElement("select"); applies.className = "papplies";
+  const fillApplies = () => {
+    const cur = applies.value || q.applies || "ALL";
+    applies.innerHTML = "";
+    const choices = appliesChoices();
+    if (!choices.some(c => c[0] === cur)) choices.push([cur, cur]);
+    choices.forEach(c => { const o = document.createElement("option"); o.value = c[0]; o.textContent = c[1]; applies.appendChild(o); });
+    applies.value = cur;
+  };
+  fillApplies();
+  applies.addEventListener("focus", fillApplies);
+  const min = inp("pmin", "", q.min, "number");
+  const value = inp("pvalue", "", q.value, "number");
+  const from = inp("pfrom", "", q.from, "date"), until = inp("puntil", "", q.until, "date");
+  from.title = "Starts on (empty = now)"; until.title = "Ends on (empty = no end)";
+  const lab = document.createElement("label");
+  const act = document.createElement("input"); act.type = "checkbox"; act.className = "pactive"; act.checked = q.active !== false;
+  lab.append(act, "On");
+  const del = document.createElement("button"); del.type = "button"; del.className = "del"; del.textContent = "×"; del.title = "Remove this offer";
+  del.onclick = () => box.remove();
+  const hint = document.createElement("p"); hint.className = "phint";
+  const refresh = () => {
+    const t = type.value;
+    const pl = { percent: ["Min qty per item (optional)", "% off"], buyget: ["Buy this many", "Get this many free"], spend: ["Min order (RM)", "RM off"], spendpct: ["Min order (RM)", "% off"] }[t];
+    min.placeholder = pl[0]; value.placeholder = pl[1]; min.title = pl[0]; value.title = pl[1];
+    applies.style.display = (t === "spend" || t === "spendpct") ? "none" : "";
+    const d = { name: name.value, type: t, applies: applies.value, min: Number(min.value) || 0, value: Number(value.value) || 0, until: until.value };
+    hint.textContent = d.value > 0 ? "Customers see: " + describePromo(d, true) + (from.value ? " (from " + plainDate(from.value) + ")" : "") : "Fill in the amount to see how this offer reads.";
+  };
+  [name, type, applies, min, value, from, until].forEach(e => { e.addEventListener("input", refresh); e.addEventListener("change", refresh); });
+  refresh();
+  r1.append(name, type, applies);
+  r2.append(min, value, from, until, lab, del);
+  box.append(r1, r2, hint);
+  return box;
+}
+function promoCollect() {
+  return [...$("pRows").children].map(b => ({
+    name: b.querySelector(".pname").value.trim(),
+    type: b.querySelector(".ptype").value,
+    applies: ["spend", "spendpct"].includes(b.querySelector(".ptype").value) ? "ALL" : b.querySelector(".papplies").value,
+    min: b.querySelector(".pmin").value === "" ? 0 : Number(b.querySelector(".pmin").value),
+    value: Number(b.querySelector(".pvalue").value),
+    from: b.querySelector(".pfrom").value,
+    until: b.querySelector(".puntil").value,
+    active: b.querySelector(".pactive").checked
+  }));
 }
 
 function nextCode(used) {
@@ -981,7 +1201,9 @@ function ownerCollect() {
       price: r.querySelector(".price").value,
       cat: r.querySelector(".cat").value.trim() || "Other",
       available: r.querySelector(".avail").checked,
-      img: r.querySelector(".img").value.trim()
+      img: r.querySelector(".img").value.trim(),
+      from: r.querySelector(".from").value,
+      until: r.querySelector(".until").value
     };
   });
 }
@@ -998,7 +1220,7 @@ async function ownerLogin() {
     const data = await ownerCall({ action: "admin_login", password: pw });
     if (data && data.ok) {
       ownerPassword = pw; $("oPass").value = "";
-      ownerFill();
+      ownerFill(data);
       $("ownerLogin").style.display = "none"; $("ownerEdit").style.display = "";
     } else ownerMsg($("oLoginError"), (data && data.error) || "Could not log in.");
   } catch (e) { ownerMsg($("oLoginError"), "Could not connect. Please try again."); }
@@ -1013,14 +1235,24 @@ async function ownerSave() {
     if (list[k].price === "" || !(Number(list[k].price) >= 0)) { ownerMsg($("oError"), "Row " + (k + 1) + " (" + list[k].name + "): please enter a price."); return; }
   }
   if (!list.length) { ownerMsg($("oError"), "Add at least one product first."); return; }
+  for (let k = 0; k < list.length; k++) {
+    if (list[k].from && list[k].until && list[k].until < list[k].from) { ownerMsg($("oError"), "Row " + (k + 1) + " (" + list[k].name + "): the end date is before the start date."); return; }
+  }
+  const promos = promoCollect();
+  for (let k = 0; k < promos.length; k++) {
+    const q = promos[k], tag = "Offer " + (k + 1) + (q.name ? " (" + q.name + ")" : "");
+    if (!q.name) { ownerMsg($("oError"), tag + ": please enter a name."); return; }
+    if (!(q.value > 0)) { ownerMsg($("oError"), tag + ": please enter the offer amount."); return; }
+    if ((q.type === "percent" || q.type === "spendpct") && q.value > 100) { ownerMsg($("oError"), tag + ": a percentage cannot be more than 100."); return; }
+    if (q.type === "buyget" && !(q.min >= 1)) { ownerMsg($("oError"), tag + ": please enter how many to buy."); return; }
+    if (q.from && q.until && q.until < q.from) { ownerMsg($("oError"), tag + ": the end date is before the start date."); return; }
+  }
   const btn = $("oSave"); btn.disabled = true; btn.textContent = "Saving…";
   try {
-    const data = await ownerCall({ action: "admin_save", password: ownerPassword, products: list });
+    const data = await ownerCall({ action: "admin_save", password: ownerPassword, products: list, promos: promos });
     if (data && data.ok) {
-      applyProducts(list);
-      try { localStorage.setItem("products", JSON.stringify(PRODUCTS)); } catch (e) {}
-      renderCats(); renderList(); renderOrder(); ownerFill();
-      ownerMsg($("oOk"), "Saved. Customers will see the new list now.");
+      await loadProducts();                         // the customer view = what the server lists today
+      ownerMsg($("oOk"), "Saved. Customers will see the new list and offers now.");
     } else ownerMsg($("oError"), (data && data.error) || "Could not save. Please try again.");
   } catch (e) { ownerMsg($("oError"), "Could not connect. Please try again."); }
   btn.disabled = false; btn.textContent = "Save changes";
@@ -1040,6 +1272,7 @@ $("oPass").addEventListener("keydown", e => { if (e.key === "Enter") ownerLogin(
 $("oCloseLogin").onclick = $("oLogout").onclick = ownerClose;
 $("oAdd").onclick = () => { const r = ownerRow({ code: "", name: "", pack: "", price: "", cat: "", available: true, img: "" }); $("oRows").appendChild(r); r.querySelector(".name").focus(); };
 $("oSave").onclick = ownerSave;
+$("pAdd").onclick = () => { const b = promoRow({ name: "", type: "percent", applies: "ALL", min: "", value: "", from: "", until: "", active: true }); $("pRows").appendChild(b); b.querySelector(".pname").focus(); };
 $("review").onclick = $("mReview").onclick = openModal;
 $("submitBtn").onclick = submitOrder;
 $("closeModal").onclick = () => $("modal").classList.remove("open");
@@ -1056,7 +1289,7 @@ $("closeTrack").onclick = () => $("trackModal").classList.remove("open");
 $("trackModal").onclick = e => { if (e.target === $("trackModal")) $("trackModal").classList.remove("open"); };
 $("search").addEventListener("input", renderList);
 
-initStyle(); renderHero(); renderCats(); renderList(); renderOrder();
+initStyle(); renderOffers(); renderHero(); renderCats(); renderList(); renderOrder();
 loadProducts();
 </script>
 </body>
